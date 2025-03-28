@@ -13,9 +13,9 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
 
 		builder.Property(o => o.Content).HasColumnType("jsonb");//.HasMaxLength(2000)
 
-		builder.HasMany<OutboxMessageConsumer>()
-			.WithOne()
-			.HasForeignKey(x => x.OutboxMessageId)
-			.OnDelete(DeleteBehavior.Cascade);
+		//builder.HasMany<OutboxMessageConsumer>()
+		//	.WithOne()
+		//	.HasForeignKey(x => x.OutboxMessageId)
+		//	.OnDelete(DeleteBehavior.Cascade);
 	}
 }

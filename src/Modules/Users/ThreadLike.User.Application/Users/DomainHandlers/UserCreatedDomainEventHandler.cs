@@ -22,7 +22,7 @@ namespace ThreadLike.User.Application.Users.DomainHandlers
 		{
 			Domain.Users.User getUser  = await userRepository.GetById(domainEvent.NewUserId);
 			
-			await eventBus.PublishAsync(new UsersModuleContracts.UserCreatedIntegrationEvent(
+		await eventBus.PublishAsync(new UsersModuleContracts.UserCreatedIntegrationEvent(
 				domainEvent.Id,
 				domainEvent.OccuredTimeUtc,
 				getUser.Id,

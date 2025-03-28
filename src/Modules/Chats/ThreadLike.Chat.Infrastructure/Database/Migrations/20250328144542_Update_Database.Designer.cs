@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ThreadLike.Chat.Infrastructure.Database;
@@ -12,9 +13,11 @@ using ThreadLike.Chat.Infrastructure.Database;
 namespace ThreadLike.Chat.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250328144542_Update_Database")]
+    partial class Update_Database
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
