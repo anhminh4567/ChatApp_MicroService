@@ -33,10 +33,10 @@ namespace ThreadLike.Chat.Domain.Users
 			UpdatedAt = updatedAt;
 			IsVerified = false;
 		}
-		public static User Create(string name, string email, string identityId, string? avatarUri = null)
+		public static User Create(string name, string email, string identityId, string? avatarUri = null, DateTime? CreatedAt =null)
 		{
 			var dateTime = DateTime.UtcNow;
-			var user = new User(Guid.NewGuid().ToString(), name, email, identityId, avatarUri, dateTime, dateTime);
+			var user = new User(Guid.NewGuid().ToString(), name, email, identityId, avatarUri, dateTime, CreatedAt ?? dateTime);
 			// Raise domain event if necessary
 			return user;
 		}

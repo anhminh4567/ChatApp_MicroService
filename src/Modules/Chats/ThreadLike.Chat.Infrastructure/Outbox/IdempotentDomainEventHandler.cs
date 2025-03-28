@@ -1,10 +1,10 @@
 ﻿using System.Data.Common;
 using Dapper;
 using MediatR;
+using ThreadLike.Chat.Infrastructure.Database;
 using ThreadLike.Common.Application.Data;
 using ThreadLike.Common.Domain;
 using ThreadLike.Common.Infrastructure.Outbox;
-using ThreadLike.User.Infrastructure.Database;
 
 namespace ThreadLike.Chat.Infrastructure.Outbox;
 
@@ -16,9 +16,9 @@ internal sealed class IdempotentDomainEventHandler<TDomainEvent> : INotification
 {
 	private readonly INotificationHandler<TDomainEvent> decorated;
 	private readonly IDbConnectionFactory dbConnectionFactory;
-	private readonly UserDbContext dbContext;
+	private readonly ChatDbContext dbContext;
 
-	public IdempotentDomainEventHandler(INotificationHandler<TDomainEvent> decorated, IDbConnectionFactory dbConnectionFactory, UserDbContext dbContext)
+	public IdempotentDomainEventHandler(INotificationHandler<TDomainEvent> decorated, IDbConnectionFactory dbConnectionFactory, ChatDbContext dbContext)
 	{
 		this.decorated = decorated;
 		this.dbConnectionFactory = dbConnectionFactory;
@@ -49,7 +49,7 @@ internal sealed class IdempotentDomainEventHandler<TDomainEvent> : INotification
 			"""
             SELECT EXISTS(
                 SELECT 1
-                FROM users."OutboxMessageConsumers"
+                FROM chat."OutboxMessageConsumers"
                 WHERE "OutboxMessageId" = @OutboxMessageId AND
                       "Name" = @Name
             )
@@ -64,7 +64,7 @@ internal sealed class IdempotentDomainEventHandler<TDomainEvent> : INotification
 	{
 		const string sql =
 			"""
-            INSERT INTO users."OutboxMessageConsumers"("OutboxMessageId", "Name")
+            INSERT INTO chat."OutboxMessageConsumers"("OutboxMessageId", "Name")
             VALUES (@OutboxMessageId, @Name)
             """;
 

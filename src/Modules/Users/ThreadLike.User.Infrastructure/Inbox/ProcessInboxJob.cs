@@ -33,7 +33,6 @@ internal sealed class ProcessInboxJob(
 
 		IReadOnlyList<InboxMessageResponse> inboxMessages = await GetInboxMessagesAsync(connection, transaction);
 
-		using IServiceScope scope = serviceScopeFactory.CreateScope();
 
 		foreach (InboxMessageResponse inboxMessage in inboxMessages)
 		{
@@ -44,6 +43,8 @@ internal sealed class ProcessInboxJob(
 				IIntegrationEvent integrationEvent = JsonConvert.DeserializeObject<IIntegrationEvent>(
 					inboxMessage.Content,
 					SerializerSettings.Instance)!;
+
+				using IServiceScope scope = serviceScopeFactory.CreateScope();
 
 
 				IEnumerable<IIntegrationEventHandler> handlers = IntegrationEventHandlersFactory.GetHandlers(

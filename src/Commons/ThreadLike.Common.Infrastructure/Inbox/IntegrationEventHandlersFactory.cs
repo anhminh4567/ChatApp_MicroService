@@ -10,16 +10,16 @@ public static class IntegrationEventHandlersFactory
 	private static readonly ConcurrentDictionary<string, Type[]> HandlersDictionary = new();
 
 	public static IEnumerable<IIntegrationEventHandler> GetHandlers(
-		Type type,
+		Type integrationEventType,
 		IServiceProvider serviceProvider,
 		Assembly assembly)
 	{
 		Type[] integrationEventHandlerTypes = HandlersDictionary.GetOrAdd(
-			$"{assembly.GetName().Name}-{type.Name}",
+			$"{assembly.GetName().Name}-{integrationEventType.Name}",
 			_ =>
 			{
 				Type[] integrationEventHandlers = assembly.GetTypes()
-					.Where(t => t.IsAssignableTo(typeof(IIntegrationEventHandler<>).MakeGenericType(type)))
+					.Where(t => t.IsAssignableTo(typeof(IIntegrationEventHandler<>).MakeGenericType(integrationEventType)))
 					.ToArray();
 
 				return integrationEventHandlers;

@@ -1,4 +1,4 @@
-﻿namespace ThreadLike.User.Api
+﻿namespace ThreadLike.Chat.Api
 {
 	public static class ChatModuleMetaData
 	{

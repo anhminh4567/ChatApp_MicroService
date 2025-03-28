@@ -17,9 +17,9 @@ public sealed class InboxMessageConfiguration : IEntityTypeConfiguration<InboxMe
 		builder.Property(o => o.OccurredOnUtc);//.HasColumnName("occurred_on_utc");
 		builder.Property(o => o.Error);//.HasColumnName("error");
 
-		builder.HasMany<InboxMessageConsumer>()
-			.WithOne()
-			.HasForeignKey(x => x.InboxMessageId)
-			.OnDelete(DeleteBehavior.Cascade);
+		//builder.HasMany<InboxMessageConsumer>()
+		//	.WithOne()
+		//	.HasForeignKey(x => x.InboxMessageId)
+		//	.OnDelete(DeleteBehavior.Cascade);
 	}
 }

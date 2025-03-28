@@ -10,9 +10,9 @@ using ThreadLike.Chat.Domain.Users;
 using ThreadLike.Common.Application.Messaging;
 using ThreadLike.Common.Domain;
 
-namespace ThreadLike.Chat.Application.Users.Commands
+namespace ThreadLike.Chat.Application.Users.Commands.Create
 {
-	public record CreateUserCommand(string Name, string Email, string Password, string IdentityId, bool IsVerified ) : ICommand<Result<User>>;
+	public record CreateUserCommand(string Name, string Email, string IdentityId, bool IsVerified) : ICommand<Result<User>>;
 	internal class CreateUserCommandHandler(
 		IUserRepository userRepository,
 		IUnitOfWork unitOfWork,
@@ -21,9 +21,9 @@ namespace ThreadLike.Chat.Application.Users.Commands
 		public async Task<Result<User>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
 		{
 
-			User user = User.Create(request.Name,request.Email,request.IdentityId);
+			User user = User.Create(request.Name, request.Email, request.IdentityId);
 
-			if(request.IsVerified)
+			if (request.IsVerified)
 			{
 				user.Verify();
 			}

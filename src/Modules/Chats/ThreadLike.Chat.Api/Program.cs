@@ -8,6 +8,8 @@ using ThreadLike.Chat.Application;
 using ThreadLike.Chat.Infrastructure;
 using ThreadLike.Chat.Api.Extensions;
 using ThreadLike.Chat.Api;
+using ThreadLike.Chat.Api.Consumers;
+using MassTransit;
 internal class Program
 {
 	private static void Main(string[] args)
@@ -70,8 +72,14 @@ internal class Program
 		builder.Services.AddChatApplication();
 		// Add infra
 		builder.Services.AddInfrastructure(builder.Configuration, rabbitMqSettings, ChatModuleMetaData.ServiceName, [
-			(config, identity) => config.AddConsumer<ChatMessageConsumer>(identity)
-			]);
+			(config, identity) => {
+				config.AddConsumer<UserCreatedIntegrationEventConsumer>((ctx ,cfig) => {
+					cfig.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(25)));
+				}).Endpoint(cfg => cfg.InstanceId = identity);
+				config.AddConsumer<UserUpdatedIntegrationEventConsumer>()
+				.Endpoint(cfg => cfg.InstanceId = identity);
+
+			}]);
 		builder.Services.AddChatInfrastructure(builder.Configuration);
 
 

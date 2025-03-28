@@ -7,6 +7,7 @@ public abstract class IntegrationEventHandler<TIntegrationEvent> : IIntegrationE
 {
 	public abstract Task Handle(TIntegrationEvent integrationEvent, CancellationToken cancellationToken = default);
 
-	public Task Handle(IIntegrationEvent integrationEvent, CancellationToken cancellationToken = default) =>
-		Handle((TIntegrationEvent)integrationEvent, cancellationToken);
+	public  Task Handle(IIntegrationEvent integrationEvent, CancellationToken cancellationToken = default)
+		=> Handle((TIntegrationEvent)integrationEvent, cancellationToken);
+
 }

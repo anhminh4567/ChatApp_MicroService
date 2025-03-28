@@ -41,9 +41,6 @@ public static class InfrastructureConfiguration
 		services.AddSingleton(dataSource);
 		services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
 
-		//services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-
-
 		//services.AddDistributedMemoryCache(setup =>
 		//{
 		//});

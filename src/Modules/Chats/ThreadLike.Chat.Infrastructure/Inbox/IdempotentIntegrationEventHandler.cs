@@ -39,7 +39,7 @@ internal sealed class IdempotentIntegrationEventHandler<TIntegrationEvent>(
 			"""
            SELECT EXISTS(
                SELECT 1
-               FROM users."InboxMessageConsumers"
+               FROM chat."InboxMessageConsumers"
                WHERE "InboxMessageId" = @InboxMessageId AND
                      "Name" = @Name
            )
@@ -54,7 +54,7 @@ internal sealed class IdempotentIntegrationEventHandler<TIntegrationEvent>(
 	{
 		const string sql =
 			"""
-           INSERT INTO users."InboxMessageConsumers"("InboxMessageId", "Name")
+           INSERT INTO chat."InboxMessageConsumers"("InboxMessageId", "Name")
            VALUES (@InboxMessageId, @Name)
            """;
 

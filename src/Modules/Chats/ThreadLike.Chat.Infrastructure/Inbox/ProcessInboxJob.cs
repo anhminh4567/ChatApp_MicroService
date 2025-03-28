@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quartz;
+using ThreadLike.Chat.Application;
 using ThreadLike.Common.Application.Data;
 using ThreadLike.Common.Application.EventBus;
 using ThreadLike.Common.Contracts.Abstracts;
 using ThreadLike.Common.Infrastructure.Inbox;
 using ThreadLike.Common.Infrastructure.Serialization;
-using ThreadLike.User.Application;
 
 namespace ThreadLike.Chat.Infrastructure.Inbox;
 
@@ -22,18 +22,18 @@ internal sealed class ProcessInboxJob(
 	IOptions<InboxOptions> inboxOptions,
 	ILogger<ProcessInboxJob> logger) : IJob
 {
-	private const string ModuleName = "User";
+	private const string ModuleName = "Chat";
 
 	public async Task Execute(IJobExecutionContext context)
 	{
 		logger.LogInformation("{Module} - Beginning to process inbox messages", ModuleName);
 
-		await using DbConnection connection = await dbConnectionFactory.OpenConnectionAsync();
-		await using DbTransaction transaction = await connection.BeginTransactionAsync();
+		using DbConnection connection = await dbConnectionFactory.OpenConnectionAsync();
+		using DbTransaction transaction = await connection.BeginTransactionAsync();
 
 		IReadOnlyList<InboxMessageResponse> inboxMessages = await GetInboxMessagesAsync(connection, transaction);
 
-		using IServiceScope scope = serviceScopeFactory.CreateScope();
+		//using IServiceScope scope = serviceScopeFactory.CreateScope();
 
 		foreach (InboxMessageResponse inboxMessage in inboxMessages)
 		{
@@ -44,18 +44,18 @@ internal sealed class ProcessInboxJob(
 				IIntegrationEvent integrationEvent = JsonConvert.DeserializeObject<IIntegrationEvent>(
 					inboxMessage.Content,
 					SerializerSettings.Instance)!;
+				using IServiceScope scope = serviceScopeFactory.CreateScope();
 
 
 				IEnumerable<IIntegrationEventHandler> handlers = IntegrationEventHandlersFactory.GetHandlers(
 					integrationEvent.GetType(),
 					scope.ServiceProvider,
-					typeof(ApplicationConfiguration).Assembly
-					);
+					typeof(ApplicationConfiguration).Assembly);
 				// how handler now assume to be in application layer
 
 				foreach (IIntegrationEventHandler integrationEventHandler in handlers)
 				{
-					await integrationEventHandler.Handle(integrationEvent, context.CancellationToken);
+					 integrationEventHandler.Handle(integrationEvent, context.CancellationToken).Wait();
 				}
 			}
 			catch (Exception caughtException)
@@ -86,7 +86,7 @@ internal sealed class ProcessInboxJob(
              SELECT
                 "Id" AS {nameof(InboxMessageResponse.Id)},
                 "Content" AS {nameof(InboxMessageResponse.Content)}
-             FROM users."InboxMessages"
+             FROM chat."InboxMessages"
              WHERE "ProcessedOnUtc" IS NULL
              ORDER BY "OccurredOnUtc"
              LIMIT {inboxOptions.Value.BatchSize}
@@ -108,7 +108,7 @@ internal sealed class ProcessInboxJob(
 	{
 		const string sql =
 			"""
-            UPDATE users."InboxMessages"
+            UPDATE chat."InboxMessages"
             SET "ProcessedOnUtc" = @ProcessedOnUtc,
                 "Error" = @Error
             WHERE "Id" = @Id

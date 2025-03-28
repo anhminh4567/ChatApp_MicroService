@@ -1,4 +1,5 @@
-﻿using ThreadLike.Chat.Domain.Reactions;
+﻿using Microsoft.EntityFrameworkCore;
+using ThreadLike.Chat.Domain.Reactions;
 using ThreadLike.Chat.Infrastructure.Database;
 using ThreadLike.Common.Domain.Ultils;
 
@@ -27,7 +28,13 @@ namespace ThreadLike.Chat.Api.Extensions
 					}
 					var reaction = Reaction.Create(content,fileName,mimeType);
 					reaction.SetId(fileName);
-					dbContext.Reactions.Add(reaction);
+
+					bool exist = dbContext.Reactions.AnyAsync(x => x.Id == reaction.Id).Result;
+					if(!exist)
+					{
+						dbContext.Reactions.Add(reaction);
+					}
+
 				}
 			}
 			dbContext.SaveChanges();

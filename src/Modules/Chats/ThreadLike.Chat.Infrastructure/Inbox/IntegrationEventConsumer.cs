@@ -9,7 +9,7 @@ using ThreadLike.Common.Infrastructure.Serialization;
 
 namespace ThreadLike.Chat.Infrastructure.Inbox;
 
-internal sealed class IntegrationEventConsumer<TIntegrationEvent> : IConsumer<TIntegrationEvent>
+public class IntegrationEventConsumer<TIntegrationEvent> : IConsumer<TIntegrationEvent>
 	where TIntegrationEvent : IntegrationEvent
 {
 	private readonly IDbConnectionFactory dbConnectionFactory;
@@ -35,7 +35,7 @@ internal sealed class IntegrationEventConsumer<TIntegrationEvent> : IConsumer<TI
 
 		const string sql =
 			"""
-            INSERT INTO users."InboxMessages"("Id", "Type", "Content", "OccurredOnUtc")
+            INSERT INTO chat."InboxMessages"("Id", "Type", "Content", "OccurredOnUtc")
             VALUES (@Id, @Type, @Content::json, @OccurredOnUtc)
             """;
 

@@ -17,7 +17,7 @@ namespace ThreadLike.Chat.Infrastructure.Outbox;
 [DisallowConcurrentExecution]
 internal sealed class ProcessOutboxJob : IJob
 {
-	private const string ModuleName = "Users";
+	private const string ModuleName = "Chat";
 	private readonly IDbConnectionFactory _dbConnectionFactory;
 	private readonly IServiceScopeFactory _serviceScopeFactory;
 	private readonly IOptions<OutboxOptions> _outboxOptions;
@@ -97,7 +97,7 @@ internal sealed class ProcessOutboxJob : IJob
                 "OccurredOnUtc" AS {nameof(OutboxMessage.OccurredOnUtc)},
                 "ProcessedOnUtc" AS {nameof(OutboxMessage.ProcessedOnUtc)},
                 "Error" AS {nameof(OutboxMessage.Error)},  "Type" AS {nameof(OutboxMessage.Type)}
-             FROM users."OutboxMessages"
+             FROM chat."OutboxMessages"
              WHERE "ProcessedOnUtc" IS NULL
              ORDER BY "OccurredOnUtc"
              LIMIT {_outboxOptions.Value.BatchSize}
@@ -118,7 +118,7 @@ internal sealed class ProcessOutboxJob : IJob
 	{
 		const string sql =
 			"""
-            UPDATE users."OutboxMessages"
+            UPDATE chat."OutboxMessages"
             SET "ProcessedOnUtc" = @ProcessedOnUtc,
                 "Error" = @Error
             WHERE "Id" = @Id

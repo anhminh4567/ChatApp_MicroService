@@ -1,14 +1,15 @@
 ﻿using MassTransit;
 using MediatR;
+using ThreadLike.Chat.Infrastructure.Inbox;
+using ThreadLike.Common.Application.Data;
 using ThreadLike.Common.Contracts;
 
 namespace ThreadLike.Chat.Api.Consumers
 {
-	public class UserCreatedIntegrationEventConsumer(IMediator mediator) : IConsumer<UsersModuleContracts.UserCreatedIntegrationEvent>
+	public class UserCreatedIntegrationEventConsumer : IntegrationEventConsumer<UsersModuleContracts.UserCreatedIntegrationEvent>
 	{
-		public async Task Consume(ConsumeContext<UsersModuleContracts.UserCreatedIntegrationEvent> context)
+		public UserCreatedIntegrationEventConsumer(IDbConnectionFactory dbConnectionFactory) : base(dbConnectionFactory)
 		{
-			throw new NotImplementedException();
 		}
 	}
 }

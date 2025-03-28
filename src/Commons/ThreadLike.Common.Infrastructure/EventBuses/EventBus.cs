@@ -5,6 +5,8 @@ using ThreadLike.Common.Contracts.Abstracts;
 namespace ThreadLike.Common.Infrastructure.EventBuses;
 public class EventBus : IEventBus
 {
+
+	//private readonly IPublishEndpoint : for scoped service, but since we register this as a singleton, we use IBus
 	private readonly IBus _bus;
 
 	public EventBus(IBus bus)
