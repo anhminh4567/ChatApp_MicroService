@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThreadLike.Chat.Domain.Shared
+namespace ThreadLike.Common.Domain.Ultils
 {
-	public static class Utils
+	public static class IdGenUltils
 	{
 		public static string GetIdGen(int length)
 		{
-			if(length > 40 || length < 1)
+			if (length > 40 || length < 1)
 			{
 				throw new ArgumentException("Length must be between 1 and 40");
 			}
@@ -21,7 +21,7 @@ namespace ThreadLike.Chat.Domain.Shared
 			{
 				id[i] = allowedGen[random.Next(0, allowedGen.Length)];
 			}
-			return id.ToString()!;
+			return new string(id);
 		}
 	}
 }

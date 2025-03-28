@@ -13,7 +13,7 @@ using ThreadLike.Chat.Infrastructure.Database;
 namespace ThreadLike.Chat.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    [Migration("20250327162921_Create_Database")]
+    [Migration("20250328061718_Create_Database")]
     partial class Create_Database
     {
         /// <inheritdoc />
@@ -26,92 +26,6 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("ThreadLike.Chat.Domain.Group.Entities.UserGroupRole", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("RoleName")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "GroupId", "RoleName");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("RoleName");
-
-                    b.ToTable("UserGroupRoles", "chat");
-                });
-
-            modelBuilder.Entity("ThreadLike.Chat.Domain.GroupMessages.Entities.GroupMessageReaction", b =>
-                {
-                    b.Property<Guid>("MesssageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ReactionId")
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("GroupMessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<List<string>>("ReactorIds")
-                        .IsRequired()
-                        .HasColumnType("text[]");
-
-                    b.HasKey("MesssageId", "ReactionId");
-
-                    b.HasIndex("GroupMessageId");
-
-                    b.HasIndex("ReactionId");
-
-                    b.ToTable("GroupMessageReaction", "chat");
-                });
-
-            modelBuilder.Entity("ThreadLike.Chat.Domain.GroupMessages.GroupMessage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("ReferenceId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("RefrenceMessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("ReferenceId");
-
-                    b.HasIndex("RefrenceMessageId");
-
-                    b.HasIndex("SenderId");
-
-                    b.HasIndex("Id", "GroupId")
-                        .IsUnique();
-
-                    b.ToTable("GroupMessage", "chat");
-                });
 
             modelBuilder.Entity("ThreadLike.Chat.Domain.GroupRoles.GroupRole", b =>
                 {
@@ -156,6 +70,32 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                         });
                 });
 
+            modelBuilder.Entity("ThreadLike.Chat.Domain.Groups.Entities.Participants", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RoleName")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsMuted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId", "GroupId", "RoleName");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("RoleName");
+
+                    b.ToTable("UserGroupRoles", "chat");
+                });
+
             modelBuilder.Entity("ThreadLike.Chat.Domain.Groups.Group", b =>
                 {
                     b.Property<Guid>("Id")
@@ -169,6 +109,12 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("DeleteAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("GroupType")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -180,6 +126,21 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                     b.ToTable("Groups", "chat");
                 });
 
+            modelBuilder.Entity("ThreadLike.Chat.Domain.Messages.Entities.MessageAttachment", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("MessageId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id", "MessageId");
+
+                    b.HasIndex("MessageId");
+
+                    b.ToTable("MessageAttachment", "chat");
+                });
+
             modelBuilder.Entity("ThreadLike.Chat.Domain.Messages.Entities.MessageReaction", b =>
                 {
                     b.Property<Guid>("MesssageId")
@@ -188,16 +149,11 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                     b.Property<string>("ReactionId")
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("MessageId")
-                        .HasColumnType("uuid");
-
                     b.Property<List<string>>("ReactorIds")
                         .IsRequired()
                         .HasColumnType("text[]");
 
                     b.HasKey("MesssageId", "ReactionId");
-
-                    b.HasIndex("MessageId");
 
                     b.HasIndex("ReactionId");
 
@@ -220,30 +176,23 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid?>("ReferenceId")
+                    b.Property<Guid>("GroupId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("RefrenceMessageId")
+                    b.Property<Guid?>("ReferenceId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("SenderId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("RefrenceMessageId");
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ReferenceId");
 
                     b.HasIndex("SenderId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Message", "chat");
                 });
@@ -453,10 +402,10 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                     b.ToTable("OutboxMessageConsumers", "chat");
                 });
 
-            modelBuilder.Entity("ThreadLike.Chat.Domain.Group.Entities.UserGroupRole", b =>
+            modelBuilder.Entity("ThreadLike.Chat.Domain.Groups.Entities.Participants", b =>
                 {
                     b.HasOne("ThreadLike.Chat.Domain.Groups.Group", null)
-                        .WithMany("UserGroupRoles")
+                        .WithMany("Participants")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -474,45 +423,6 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ThreadLike.Chat.Domain.GroupMessages.Entities.GroupMessageReaction", b =>
-                {
-                    b.HasOne("ThreadLike.Chat.Domain.GroupMessages.GroupMessage", null)
-                        .WithMany("Reactions")
-                        .HasForeignKey("GroupMessageId");
-
-                    b.HasOne("ThreadLike.Chat.Domain.Reactions.Reaction", null)
-                        .WithMany()
-                        .HasForeignKey("ReactionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ThreadLike.Chat.Domain.GroupMessages.GroupMessage", b =>
-                {
-                    b.HasOne("ThreadLike.Chat.Domain.Groups.Group", null)
-                        .WithMany("Messages")
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ThreadLike.Chat.Domain.GroupMessages.GroupMessage", null)
-                        .WithMany()
-                        .HasForeignKey("ReferenceId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("ThreadLike.Chat.Domain.GroupMessages.GroupMessage", "RefrenceMessage")
-                        .WithMany()
-                        .HasForeignKey("RefrenceMessageId");
-
-                    b.HasOne("ThreadLike.Chat.Domain.Users.User", null)
-                        .WithMany("GroupMessages")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("RefrenceMessage");
-                });
-
             modelBuilder.Entity("ThreadLike.Chat.Domain.Groups.Group", b =>
                 {
                     b.HasOne("ThreadLike.Chat.Domain.Users.User", "Creator")
@@ -521,14 +431,113 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.OwnsOne("ThreadLike.Chat.Domain.Shared.MediaObject", "ThumbDetail", b1 =>
+                        {
+                            b1.Property<Guid>("GroupId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("FileUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("MimeType")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Name")
+                                .HasColumnType("text");
+
+                            b1.HasKey("GroupId");
+
+                            b1.ToTable("Groups", "chat");
+
+                            b1.ToJson("ThumbDetail");
+
+                            b1.WithOwner()
+                                .HasForeignKey("GroupId");
+                        });
+
                     b.Navigation("Creator");
+
+                    b.Navigation("ThumbDetail");
+                });
+
+            modelBuilder.Entity("ThreadLike.Chat.Domain.Messages.Entities.MessageAttachment", b =>
+                {
+                    b.HasOne("ThreadLike.Chat.Domain.Messages.Message", null)
+                        .WithMany("MessageAttachments")
+                        .HasForeignKey("MessageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("ThreadLike.Chat.Domain.Shared.MediaObject", "AttachmentDetail", b1 =>
+                        {
+                            b1.Property<string>("MessageAttachmentId")
+                                .HasColumnType("text");
+
+                            b1.Property<Guid>("MessageAttachmentMessageId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("FileUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("MimeType")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Name")
+                                .HasColumnType("text");
+
+                            b1.HasKey("MessageAttachmentId", "MessageAttachmentMessageId");
+
+                            b1.ToTable("MessageAttachment", "chat");
+
+                            b1.ToJson("AttachmentDetail");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MessageAttachmentId", "MessageAttachmentMessageId");
+                        });
+
+                    b.OwnsOne("ThreadLike.Chat.Domain.Shared.MediaObject", "ThumbDetail", b1 =>
+                        {
+                            b1.Property<string>("MessageAttachmentId")
+                                .HasColumnType("text");
+
+                            b1.Property<Guid>("MessageAttachmentMessageId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("FileUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("MimeType")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Name")
+                                .HasColumnType("text");
+
+                            b1.HasKey("MessageAttachmentId", "MessageAttachmentMessageId");
+
+                            b1.ToTable("MessageAttachment", "chat");
+
+                            b1.ToJson("ThumbDetail");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MessageAttachmentId", "MessageAttachmentMessageId");
+                        });
+
+                    b.Navigation("AttachmentDetail")
+                        .IsRequired();
+
+                    b.Navigation("ThumbDetail");
                 });
 
             modelBuilder.Entity("ThreadLike.Chat.Domain.Messages.Entities.MessageReaction", b =>
                 {
                     b.HasOne("ThreadLike.Chat.Domain.Messages.Message", null)
                         .WithMany("MessageReactions")
-                        .HasForeignKey("MessageId");
+                        .HasForeignKey("MesssageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ThreadLike.Chat.Domain.Reactions.Reaction", null)
                         .WithMany()
@@ -539,19 +548,22 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("ThreadLike.Chat.Domain.Messages.Message", b =>
                 {
-                    b.HasOne("ThreadLike.Chat.Domain.Messages.Message", "RefrenceMessage")
-                        .WithMany()
-                        .HasForeignKey("RefrenceMessageId");
-
-                    b.HasOne("ThreadLike.Chat.Domain.Users.User", null)
-                        .WithMany("PeerReceivedMessages")
-                        .HasForeignKey("SenderId")
+                    b.HasOne("ThreadLike.Chat.Domain.Groups.Group", null)
+                        .WithMany("Messages")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ThreadLike.Chat.Domain.Messages.Message", "RefrenceMessage")
+                        .WithMany()
+                        .HasForeignKey("ReferenceId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("ThreadLike.Chat.Domain.Users.User", null)
-                        .WithMany("PeerSendMessages")
-                        .HasForeignKey("UserId");
+                        .WithMany("Messages")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("RefrenceMessage");
                 });
@@ -603,20 +615,17 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ThreadLike.Chat.Domain.GroupMessages.GroupMessage", b =>
-                {
-                    b.Navigation("Reactions");
-                });
-
             modelBuilder.Entity("ThreadLike.Chat.Domain.Groups.Group", b =>
                 {
                     b.Navigation("Messages");
 
-                    b.Navigation("UserGroupRoles");
+                    b.Navigation("Participants");
                 });
 
             modelBuilder.Entity("ThreadLike.Chat.Domain.Messages.Message", b =>
                 {
+                    b.Navigation("MessageAttachments");
+
                     b.Navigation("MessageReactions");
                 });
 
@@ -624,13 +633,9 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 {
                     b.Navigation("Friends");
 
-                    b.Navigation("GroupMessages");
-
                     b.Navigation("Letters");
 
-                    b.Navigation("PeerReceivedMessages");
-
-                    b.Navigation("PeerSendMessages");
+                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

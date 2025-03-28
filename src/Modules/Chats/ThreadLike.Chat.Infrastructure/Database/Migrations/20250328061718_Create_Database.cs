@@ -149,7 +149,10 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     CreatorId = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeleteAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    GroupType = table.Column<int>(type: "integer", nullable: false),
+                    ThumbDetail = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -157,45 +160,6 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                     table.ForeignKey(
                         name: "FK_Groups_Users_CreatorId",
                         column: x => x.CreatorId,
-                        principalSchema: "chat",
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Message",
-                schema: "chat",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SenderId = table.Column<string>(type: "text", nullable: false),
-                    ReceiverId = table.Column<string>(type: "text", nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false),
-                    ReferenceId = table.Column<Guid>(type: "uuid", nullable: true),
-                    RefrenceMessageId = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UserId = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Message", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Message_Message_RefrenceMessageId",
-                        column: x => x.RefrenceMessageId,
-                        principalSchema: "chat",
-                        principalTable: "Message",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Message_Users_SenderId",
-                        column: x => x.SenderId,
-                        principalSchema: "chat",
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Message_Users_UserId",
-                        column: x => x.UserId,
                         principalSchema: "chat",
                         principalTable: "Users",
                         principalColumn: "Id");
@@ -264,47 +228,40 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GroupMessage",
+                name: "Message",
                 schema: "chat",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    GroupId = table.Column<Guid>(type: "uuid", nullable: false),
                     SenderId = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    GroupId = table.Column<Guid>(type: "uuid", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     ReferenceId = table.Column<Guid>(type: "uuid", nullable: true),
-                    RefrenceMessageId = table.Column<Guid>(type: "uuid", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupMessage", x => x.Id);
+                    table.PrimaryKey("PK_Message", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GroupMessage_GroupMessage_ReferenceId",
-                        column: x => x.ReferenceId,
-                        principalSchema: "chat",
-                        principalTable: "GroupMessage",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_GroupMessage_GroupMessage_RefrenceMessageId",
-                        column: x => x.RefrenceMessageId,
-                        principalSchema: "chat",
-                        principalTable: "GroupMessage",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_GroupMessage_Groups_GroupId",
+                        name: "FK_Message_Groups_GroupId",
                         column: x => x.GroupId,
                         principalSchema: "chat",
                         principalTable: "Groups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GroupMessage_Users_SenderId",
+                        name: "FK_Message_Message_ReferenceId",
+                        column: x => x.ReferenceId,
+                        principalSchema: "chat",
+                        principalTable: "Message",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Message_Users_SenderId",
                         column: x => x.SenderId,
                         principalSchema: "chat",
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -314,7 +271,9 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 {
                     UserId = table.Column<string>(type: "text", nullable: false),
                     GroupId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoleName = table.Column<string>(type: "text", nullable: false)
+                    RoleName = table.Column<string>(type: "text", nullable: false),
+                    IsMuted = table.Column<bool>(type: "boolean", nullable: false),
+                    JoinedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -343,54 +302,48 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MessageAttachment",
+                schema: "chat",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    MessageId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AttachmentDetail = table.Column<string>(type: "jsonb", nullable: false),
+                    ThumbDetail = table.Column<string>(type: "jsonb", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MessageAttachment", x => new { x.Id, x.MessageId });
+                    table.ForeignKey(
+                        name: "FK_MessageAttachment_Message_MessageId",
+                        column: x => x.MessageId,
+                        principalSchema: "chat",
+                        principalTable: "Message",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MessageReaction",
                 schema: "chat",
                 columns: table => new
                 {
                     MesssageId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReactionId = table.Column<string>(type: "text", nullable: false),
-                    MessageId = table.Column<Guid>(type: "uuid", nullable: true),
                     ReactorIds = table.Column<List<string>>(type: "text[]", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MessageReaction", x => new { x.MesssageId, x.ReactionId });
                     table.ForeignKey(
-                        name: "FK_MessageReaction_Message_MessageId",
-                        column: x => x.MessageId,
+                        name: "FK_MessageReaction_Message_MesssageId",
+                        column: x => x.MesssageId,
                         principalSchema: "chat",
                         principalTable: "Message",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_MessageReaction_Reactions_ReactionId",
-                        column: x => x.ReactionId,
-                        principalSchema: "chat",
-                        principalTable: "Reactions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "GroupMessageReaction",
-                schema: "chat",
-                columns: table => new
-                {
-                    MesssageId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ReactionId = table.Column<string>(type: "text", nullable: false),
-                    GroupMessageId = table.Column<Guid>(type: "uuid", nullable: true),
-                    ReactorIds = table.Column<List<string>>(type: "text[]", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_GroupMessageReaction", x => new { x.MesssageId, x.ReactionId });
                     table.ForeignKey(
-                        name: "FK_GroupMessageReaction_GroupMessage_GroupMessageId",
-                        column: x => x.GroupMessageId,
-                        principalSchema: "chat",
-                        principalTable: "GroupMessage",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_GroupMessageReaction_Reactions_ReactionId",
+                        name: "FK_MessageReaction_Reactions_ReactionId",
                         column: x => x.ReactionId,
                         principalSchema: "chat",
                         principalTable: "Reactions",
@@ -410,59 +363,22 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupMessage_GroupId",
-                schema: "chat",
-                table: "GroupMessage",
-                column: "GroupId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupMessage_Id_GroupId",
-                schema: "chat",
-                table: "GroupMessage",
-                columns: new[] { "Id", "GroupId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupMessage_ReferenceId",
-                schema: "chat",
-                table: "GroupMessage",
-                column: "ReferenceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupMessage_RefrenceMessageId",
-                schema: "chat",
-                table: "GroupMessage",
-                column: "RefrenceMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupMessage_SenderId",
-                schema: "chat",
-                table: "GroupMessage",
-                column: "SenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupMessageReaction_GroupMessageId",
-                schema: "chat",
-                table: "GroupMessageReaction",
-                column: "GroupMessageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GroupMessageReaction_ReactionId",
-                schema: "chat",
-                table: "GroupMessageReaction",
-                column: "ReactionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Groups_CreatorId",
                 schema: "chat",
                 table: "Groups",
                 column: "CreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_RefrenceMessageId",
+                name: "IX_Message_GroupId",
                 schema: "chat",
                 table: "Message",
-                column: "RefrenceMessageId");
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Message_ReferenceId",
+                schema: "chat",
+                table: "Message",
+                column: "ReferenceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Message_SenderId",
@@ -471,15 +387,9 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Message_UserId",
+                name: "IX_MessageAttachment_MessageId",
                 schema: "chat",
-                table: "Message",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MessageReaction_MessageId",
-                schema: "chat",
-                table: "MessageReaction",
+                table: "MessageAttachment",
                 column: "MessageId");
 
             migrationBuilder.CreateIndex(
@@ -530,11 +440,11 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GroupMessageReaction",
+                name: "InboxMessageConsumers",
                 schema: "chat");
 
             migrationBuilder.DropTable(
-                name: "InboxMessageConsumers",
+                name: "MessageAttachment",
                 schema: "chat");
 
             migrationBuilder.DropTable(
@@ -555,10 +465,6 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserLetters",
-                schema: "chat");
-
-            migrationBuilder.DropTable(
-                name: "GroupMessage",
                 schema: "chat");
 
             migrationBuilder.DropTable(

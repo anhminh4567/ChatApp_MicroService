@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThreadLike.Common.Application.Ultils
+namespace ThreadLike.Common.Domain.Ultils
 {
 	public static class FileUtils
 	{

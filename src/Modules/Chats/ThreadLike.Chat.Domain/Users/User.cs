@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ThreadLike.Chat.Domain.GroupMessages;
 using ThreadLike.Chat.Domain.Messages;
 using ThreadLike.Chat.Domain.Users.Entities;
 using ThreadLike.Common.Domain;
@@ -16,17 +15,14 @@ namespace ThreadLike.Chat.Domain.Users
 		public string Name { get; private set; }
 		public string Email { get; private set; }
 		public string IdentityId { get; private set; }
-		public string AvatarUri { get; private set; }
+		public string? AvatarUri { get; private set; }
 		public DateTime CreatedAt { get; private set; }
 		public DateTime UpdatedAt { get; private set; }
 		public bool IsVerified { get; private set; }
-		public List<Message> PeerSendMessages { get; private set; } = new();
-		public List<Message> PeerReceivedMessages { get; private set; } = new();
-
-		public List<GroupMessage> GroupMessages { get; private set; } = new();
+		public List<Message> Messages { get; private set; } = new();
 		public List<UserFriend> Friends { get; private set; } = new();
 		public List<UserLetter> Letters { get; private set; } = new();
-		protected User(string id, string name, string email, string identityId, string avatarUri, DateTime createdAt, DateTime updatedAt)
+		protected User(string id, string name, string email, string identityId, string? avatarUri, DateTime createdAt, DateTime updatedAt)
 		{
 			Id = id;
 			Name = name;
@@ -37,9 +33,10 @@ namespace ThreadLike.Chat.Domain.Users
 			UpdatedAt = updatedAt;
 			IsVerified = false;
 		}
-		public static User Create(string name, string email, string identityId, string avatarUri)
+		public static User Create(string name, string email, string identityId, string? avatarUri = null)
 		{
-			var user = new User(Guid.NewGuid().ToString(), name, email, identityId, avatarUri, DateTime.UtcNow, DateTime.UtcNow);
+			var dateTime = DateTime.UtcNow;
+			var user = new User(Guid.NewGuid().ToString(), name, email, identityId, avatarUri, dateTime, dateTime);
 			// Raise domain event if necessary
 			return user;
 		}
@@ -57,5 +54,6 @@ namespace ThreadLike.Chat.Domain.Users
 			}
 			Friends.Add(new UserFriend(Id,user.Id));
 		}
+		public bool Verify() => IsVerified = true;
 	}
 }

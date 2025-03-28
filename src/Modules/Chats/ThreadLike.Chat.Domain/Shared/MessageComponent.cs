@@ -4,12 +4,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThreadLike.Common.Domain.Ultils;
 
 namespace ThreadLike.Chat.Domain.Shared
 {
 	public class MessageComponent 
 	{
-		public string Id { get; private set; } = Utils.GetIdGen(5);
+		public string Id { get; private set; } = IdGenUltils.GetIdGen(5);
 		public string? ParentId { get; private set; }
 		public string Label { get; private set; }
 		public int? SelectCount { get; private set; } = null;

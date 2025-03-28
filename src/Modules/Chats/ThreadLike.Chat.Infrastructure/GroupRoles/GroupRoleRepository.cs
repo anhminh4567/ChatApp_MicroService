@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ThreadLike.Chat.Domain.GroupMessages;
 using ThreadLike.Chat.Domain.GroupRoles;
 using ThreadLike.Chat.Infrastructure.Database;
 using ThreadLike.Common.Application.Caching;

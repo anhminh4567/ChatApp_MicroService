@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using System.Reflection;
 using ThreadLike.Chat.Application;
 using ThreadLike.Chat.Application.Abstracts;
-using ThreadLike.Chat.Domain.GroupMessages;
 using ThreadLike.Chat.Domain.GroupRoles;
 using ThreadLike.Chat.Domain.Groups;
 using ThreadLike.Chat.Domain.Messages;
@@ -17,7 +16,6 @@ using ThreadLike.Chat.Domain.Reactions;
 using ThreadLike.Chat.Domain.Users;
 using ThreadLike.Chat.Infrastructure.Authorization;
 using ThreadLike.Chat.Infrastructure.Database;
-using ThreadLike.Chat.Infrastructure.GroupMessages;
 using ThreadLike.Chat.Infrastructure.GroupRoles;
 using ThreadLike.Chat.Infrastructure.Groups;
 using ThreadLike.Chat.Infrastructure.Messages;
@@ -52,7 +50,6 @@ namespace ThreadLike.Chat.Infrastructure
 			services.AddScoped<IAuthorizationService, AuthorizationService>();
 
 			services.AddScoped<IGroupRoleRepository, GroupRoleRepository>();
-			services.AddScoped<IGroupMessageRepository, GroupMessageRepository>();
 			services.AddScoped<IGroupRepository, GroupRepository>();
 			services.AddScoped<IMessageRepository, MessageRepository>();
 			services.AddScoped<IReactionRepository, ReactionRepository>();

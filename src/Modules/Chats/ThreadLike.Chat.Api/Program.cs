@@ -5,9 +5,9 @@ using ThreadLike.Common.Infrastructure;
 using ThreadLike.Common.Infrastructure.EventBuses;
 using ThreadLike.Common.Application;
 using ThreadLike.Chat.Application;
-using ThreadLike.User.Api;
 using ThreadLike.Chat.Infrastructure;
 using ThreadLike.Chat.Api.Extensions;
+using ThreadLike.Chat.Api;
 internal class Program
 {
 	private static void Main(string[] args)
@@ -69,7 +69,9 @@ internal class Program
 		builder.Services.AddApplication([typeof(ThreadLike.Chat.Application.ApplicationConfiguration).Assembly]);
 		builder.Services.AddChatApplication();
 		// Add infra
-		builder.Services.AddInfrastructure(builder.Configuration, rabbitMqSettings, ChatModuleMetaData.ServiceName, []);
+		builder.Services.AddInfrastructure(builder.Configuration, rabbitMqSettings, ChatModuleMetaData.ServiceName, [
+			(config, identity) => config.AddConsumer<ChatMessageConsumer>(identity)
+			]);
 		builder.Services.AddChatInfrastructure(builder.Configuration);
 
 

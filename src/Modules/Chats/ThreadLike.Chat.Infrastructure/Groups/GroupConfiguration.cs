@@ -15,7 +15,7 @@ namespace ThreadLike.Chat.Infrastructure.Groups
 		{
 			builder.HasKey(x => x.Id);
 
-			builder.HasMany(x => x.UserGroupRoles)
+			builder.HasMany(x => x.Participants)
 				.WithOne()
 				.HasForeignKey(x => x.GroupId)
 				.OnDelete(DeleteBehavior.Cascade);
@@ -30,6 +30,9 @@ namespace ThreadLike.Chat.Infrastructure.Groups
 				.HasForeignKey(x => x.CreatorId)
 				.IsRequired()
 				.OnDelete(DeleteBehavior.NoAction);
+
+			builder.OwnsOne(x => x.ThumbDetail, build => build.ToJson());
+
 		}
 	}
 }

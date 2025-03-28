@@ -17,10 +17,12 @@ namespace ThreadLike.Chat.Infrastructure.Users
 			builder.Property(u => u.IdentityId).IsRequired().HasMaxLength(100);
 			builder.HasIndex(u => u.IdentityId).IsUnique();
 			
-			builder.HasMany(u => u.PeerReceivedMessages)
+			builder.HasMany(u => u.Messages)
 				.WithOne()
 				.HasForeignKey(pm => pm.SenderId)
 				.OnDelete(DeleteBehavior.Cascade);
+
+
 		}
 	}
 }

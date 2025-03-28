@@ -7,16 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThreadLike.Chat.Application.Abstracts;
-using ThreadLike.Chat.Domain.Group.Entities;
-using ThreadLike.Chat.Domain.GroupMessages;
-using ThreadLike.Chat.Domain.GroupMessages.Entities;
+
 using ThreadLike.Chat.Domain.GroupRoles;
 using ThreadLike.Chat.Domain.Groups;
+using ThreadLike.Chat.Domain.Groups.Entities;
+using ThreadLike.Chat.Domain.Messages;
 using ThreadLike.Chat.Domain.Messages.Entities;
 using ThreadLike.Chat.Domain.Reactions;
 using ThreadLike.Chat.Domain.Users;
 using ThreadLike.Chat.Domain.Users.Entities;
-using ThreadLike.Chat.Infrastructure.GroupMessages;
 using ThreadLike.Chat.Infrastructure.GroupRoles;
 using ThreadLike.Chat.Infrastructure.Groups;
 using ThreadLike.Chat.Infrastructure.Messages;
@@ -41,12 +40,15 @@ namespace ThreadLike.Chat.Infrastructure.Database
 		public DbSet<GroupRole> GroupRoles { get; set; }
 
 		public DbSet<Group> Groups { get; set; }
-		public DbSet<GroupMessage> GroupMessages { get; set; }
-		public DbSet<UserGroupRole> UserGroupRoles { get; set; }
+		public DbSet<Participants> UserGroupRoles { get; set; }
 
 		public DbSet<Reaction> Reactions { get; set; }
+		
+		public DbSet<Message> Messages { get; set; }
+		public DbSet<MessageAttachment> MessagesAttachments { get; set; }
 		public DbSet<MessageReaction> MessageReactions { get; set; }
-		public DbSet<GroupMessageReaction> GroupMessagesReaction { get; set; }
+
+
 
 		internal DbSet<InboxMessageConsumer> InboxMessageConsumers { get; set; }
 		internal DbSet<InboxMessage> InboxMessages { get; set; }
@@ -85,16 +87,19 @@ namespace ThreadLike.Chat.Infrastructure.Database
 			modelBuilder.ApplyConfiguration(new GroupRoleConfiguration());
 
 			modelBuilder.ApplyConfiguration(new GroupConfiguration());
-			modelBuilder.ApplyConfiguration(new GroupMessageConfiguration());
-			modelBuilder.ApplyConfiguration(new UserGroupRoleConfiguration());
+			modelBuilder.ApplyConfiguration(new ParticipantConfiguration());
 
 			modelBuilder.ApplyConfiguration(new ReactionConfiguration());
+
+			modelBuilder.ApplyConfiguration(new MessageConfiguration());
+			modelBuilder.ApplyConfiguration(new MessageAttachmentConfiguration());
 			modelBuilder.ApplyConfiguration(new MessageReactionConfiguration());
-			modelBuilder.ApplyConfiguration(new GroupMessageReactionConfiguration());
+
+
+
 
 			modelBuilder.ApplyConfiguration(new InboxMessageConsumerConfiguration());
 			modelBuilder.ApplyConfiguration(new InboxMessageConfiguration());
-
 			modelBuilder.ApplyConfiguration(new OutboxMessageConsumerConfiguration());
 			modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
 		}

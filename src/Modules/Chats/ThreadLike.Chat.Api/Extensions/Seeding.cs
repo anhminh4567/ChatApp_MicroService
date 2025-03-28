@@ -1,6 +1,6 @@
 ﻿using ThreadLike.Chat.Domain.Reactions;
 using ThreadLike.Chat.Infrastructure.Database;
-using ThreadLike.Common.Application.Ultils;
+using ThreadLike.Common.Domain.Ultils;
 
 namespace ThreadLike.Chat.Api.Extensions
 {
@@ -26,6 +26,7 @@ namespace ThreadLike.Chat.Api.Extensions
 						continue;
 					}
 					var reaction = Reaction.Create(content,fileName,mimeType);
+					reaction.SetId(fileName);
 					dbContext.Reactions.Add(reaction);
 				}
 			}

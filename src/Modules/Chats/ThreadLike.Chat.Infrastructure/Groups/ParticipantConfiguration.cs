@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ThreadLike.Chat.Domain.Group.Entities;
 using ThreadLike.Chat.Domain.GroupRoles;
+using ThreadLike.Chat.Domain.Groups.Entities;
 using ThreadLike.Chat.Domain.Users;
 
 namespace ThreadLike.Chat.Infrastructure.Groups
 {
-	internal class UserGroupRoleConfiguration : IEntityTypeConfiguration<UserGroupRole>
+	internal class ParticipantConfiguration : IEntityTypeConfiguration<Participants>
 	{
-		public void Configure(EntityTypeBuilder<UserGroupRole> builder)
+		public void Configure(EntityTypeBuilder<Participants> builder)
 		{
 			builder.HasKey(x => new { x.UserId, x.GroupId, x.RoleName });
 
