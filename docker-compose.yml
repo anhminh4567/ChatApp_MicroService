@@ -1,0 +1,54 @@
+services:
+
+  threadlike.redis:
+    image: redis:latest
+    container_name: threadlike.Redis
+    restart: always
+    ports:
+      - 6200:6379
+
+  threadlike.queue:
+    image: rabbitmq:management-alpine
+    container_name: threadlike.Queue
+    hostname: threadlike-queue
+    volumes:
+        - ./.containers/queue/data/:/var/lib/rabbitmq
+        - ./.containers/queue/log/:/var/log/rabbitmq
+    environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - 5671:5672
+      - 15671:15672  
+
+
+  threadlike.user.api:
+    image: ${DOCKER_REGISTRY-}threadlikeuserapi
+    container_name: threadlike.user.api
+    build:
+      context: .
+      dockerfile: src/Modules/Users/ThreadLike.User.Api/Dockerfile
+    volumes:
+        - ./.data/Logfiles/Users/:/app/Logfiles/Users/
+    depends_on:
+      - threadlike.queue
+      - threadlike.redis
+    ports:
+      - 8200:8080
+      - 8201:8081
+
+  threadlike.chat.api:
+    image: ${DOCKER_REGISTRY-}threadlikechatapi
+    container_name: threadlike.chat.api
+    build:
+      context: .
+      dockerfile: src/Modules/Chats/ThreadLike.Chat.Api/Dockerfile
+    volumes:
+        - ./.data/Logfiles/Chats/:/app/Logfiles/Chats/
+    depends_on:
+      - threadlike.queue
+      - threadlike.redis
+    ports:
+      - 8202:8080
+      - 8203:8081
+

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Commons\ThreadLike.Common.Infrastructure\ThreadLike.Common.Infrastructure.csproj" />
+    <ProjectReference Include="..\ThreadLike.User.Application\ThreadLike.User.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Database\Migrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.7.407.13" />
+    <PackageReference Include="AWSSDK.Core" Version="3.7.402.24" />
+  </ItemGroup>
+
+</Project>
