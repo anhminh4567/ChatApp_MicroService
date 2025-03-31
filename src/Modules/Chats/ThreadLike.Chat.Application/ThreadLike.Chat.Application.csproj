@@ -10,5 +10,9 @@
     <ProjectReference Include="..\..\..\Commons\ThreadLike.Common.Application\ThreadLike.Common.Application.csproj" />
     <ProjectReference Include="..\ThreadLike.Chat.Domain\ThreadLike.Chat.Domain.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="ThreadLike.Chat.IntegrationTest" />
+		<InternalsVisibleTo Include="ThreadLike.Chat.UnitTest" />
+	</ItemGroup>
 
 </Project>

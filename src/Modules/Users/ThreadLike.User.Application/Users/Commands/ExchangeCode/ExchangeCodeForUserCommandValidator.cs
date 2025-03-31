@@ -7,7 +7,6 @@ namespace ThreadLike.User.Application.Users.Commands.ExchangeCode
 		public ExchangeCodeForUserCommandValidator()
 		{
 			RuleFor(x => x.code).NotEmpty();
-			RuleFor(x => x.returnUri).NotEmpty();
 		}
 	}
 }

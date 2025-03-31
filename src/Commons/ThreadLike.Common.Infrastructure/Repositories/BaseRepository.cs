@@ -23,6 +23,7 @@ public class BaseRepository<T , TDbContext> : IBaseRepository<T>
 	{
 		return await _set.FindAsync(ids);
 	}
+
 	public virtual int GetCount()
 	{
 		return _set.Count();

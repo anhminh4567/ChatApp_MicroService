@@ -36,7 +36,13 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 newName: "MessagesAttachments",
                 newSchema: "chat");
 
-            migrationBuilder.RenameIndex(
+			migrationBuilder.RenameTable(
+				name: "UserGroupRoles",
+				schema: "chat",
+				newName: "Participants",
+				newSchema: "chat");
+
+			migrationBuilder.RenameIndex(
                 name: "IX_MessageAttachment_MessageId",
                 schema: "chat",
                 table: "MessagesAttachments",
@@ -86,8 +92,13 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 schema: "chat",
                 newName: "MessageAttachment",
                 newSchema: "chat");
+			migrationBuilder.RenameTable(
+				name: "Participants",
+				schema: "chat",
+				newName: "UserGroupRoles", 
+				newSchema: "chat");
 
-            migrationBuilder.RenameIndex(
+			migrationBuilder.RenameIndex(
                 name: "IX_MessagesAttachments_MessageId",
                 schema: "chat",
                 table: "MessageAttachment",

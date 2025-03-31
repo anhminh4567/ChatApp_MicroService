@@ -11,9 +11,9 @@ using ThreadLike.Chat.Domain.Users;
 
 namespace ThreadLike.Chat.Infrastructure.Groups
 {
-	internal class ParticipantConfiguration : IEntityTypeConfiguration<Participants>
+	internal class ParticipantConfiguration : IEntityTypeConfiguration<Participant>
 	{
-		public void Configure(EntityTypeBuilder<Participants> builder)
+		public void Configure(EntityTypeBuilder<Participant> builder)
 		{
 			builder.HasKey(x => new { x.UserId, x.GroupId, x.RoleName });
 

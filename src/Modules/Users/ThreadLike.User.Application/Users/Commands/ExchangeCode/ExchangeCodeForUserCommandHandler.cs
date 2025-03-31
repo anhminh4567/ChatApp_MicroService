@@ -14,7 +14,7 @@ using ThreadLike.User.Domain.Users;
 
 namespace ThreadLike.User.Application.Users.Commands.ExchangeCode
 {
-	public record ExchangeCodeForUserCommand(string code , string returnUri) : ICommand<Result<IdentityProviderTokenResponse>>;
+	public record ExchangeCodeForUserCommand(string code ) : ICommand<Result<IdentityProviderTokenResponse>>;
 	internal class ExchangeCodeForUserCommandHandler(
 		IIdentityProviderService _identityProviderService, 
 		IUserRepository _userRepository,

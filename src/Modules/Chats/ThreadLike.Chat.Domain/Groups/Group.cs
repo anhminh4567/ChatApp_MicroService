@@ -15,6 +15,7 @@ namespace ThreadLike.Chat.Domain.Groups
 {
 	public class Group : Entity
 	{
+		public const string PRIVATE_GROUP_NAME = "PrivateV01";
 		public Guid Id { get; private set; }
 		public string Name { get; private set; }
 		public string CreatorId { get; private set; }
@@ -24,9 +25,9 @@ namespace ThreadLike.Chat.Domain.Groups
 		public GroupType GroupType { get; private set; }
 		public MediaObject? ThumbDetail { get; private set; }
 		public List<Message> Messages { get; private set; } = new();
-		public List<Participants> Participants { get; private set; } = new();
+		public List<Participant> Participants { get; private set; } = new();
 
-		private Group(Guid id, string name, string creatorId, DateTime createdAt, GroupType type, List<Participants> participants)
+		private Group(Guid id, string name, string creatorId, DateTime createdAt, GroupType type, List<Participant> participants)
 		{
 			Id = id;
 			Name = name;
@@ -35,9 +36,18 @@ namespace ThreadLike.Chat.Domain.Groups
 			Participants = participants;
 			GroupType = type;
 		}
+		/// <summary>
+		/// Create a group, if create self reference then remember to add 2 createor and userInGroup with type Peer
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="creator"></param>
+		/// <param name="type"></param>
+		/// <param name="userInGroup"></param>
+		/// <returns></returns>
+		/// <exception cref="Exception"></exception>
 		public static Group Create(string name, User creator, GroupType type, List<User> userInGroup)
 		{
-			var group = new Group(Guid.NewGuid(), name, creator.Id, DateTime.UtcNow,type, new List<Participants>());
+			var group = new Group(Guid.NewGuid(), name, creator.Id, DateTime.UtcNow,type, new List<Participant>());
 
 
 			if (!userInGroup.Any(x => x.Id == creator.Id))
@@ -46,10 +56,10 @@ namespace ThreadLike.Chat.Domain.Groups
 			foreach (User user in userInGroup)
 			{
 				if (user.Id == creator.Id)
-					group.Participants.Add(Entities.Participants.Create(user.Id, group.Id, GroupRole.GroupLeaderName));
+					group.Participants.Add(Entities.Participant.Create(user.Id, group.Id, GroupRole.GroupLeaderName));
 
 				else
-					group.Participants.Add(Entities.Participants.Create(user.Id, group.Id, GroupRole.MemberName));
+					group.Participants.Add(Entities.Participant.Create(user.Id, group.Id, GroupRole.MemberName));
 			}
 
 			switch (type)
@@ -59,8 +69,8 @@ namespace ThreadLike.Chat.Domain.Groups
 						throw new Exception("peer group must have at 2 users");
 					break;
 				case GroupType.Group:
-					if (group.Participants.Count < 2)
-						throw new Exception("group must have at 3 users");
+					if (group.Participants.Count < 1)
+						throw new Exception("group must have atleast 1, the leader users");
 					break;
 				default:
 					throw new Exception("group typ unfit");
@@ -73,7 +83,7 @@ namespace ThreadLike.Chat.Domain.Groups
 			if (Participants.Any(x => x.UserId == user.Id))
 				return Result.Failure("user already in group");
 
-			Participants.Add(Entities.Participants.Create(user.Id, Id, roleType.Role));
+			Participants.Add(Entities.Participant.Create(user.Id, Id, roleType.Role));
 			return Result.Ok();
 		}
 		public Result RemoveFromGroup(User user)

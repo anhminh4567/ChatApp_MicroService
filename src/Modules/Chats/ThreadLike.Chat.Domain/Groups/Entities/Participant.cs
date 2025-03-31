@@ -7,29 +7,29 @@ using ThreadLike.Common.Domain;
 
 namespace ThreadLike.Chat.Domain.Groups.Entities
 {
-	public class Participants : Entity
+	public class Participant : Entity
 	{
 		public string UserId { get; private set; }
 		public Guid GroupId { get; private set; }
 		public string RoleName { get; private set; }
 		public bool IsMuted { get; private set; } = false;
 		public DateTime JoinedAt { get; private set; }
-		private Participants(string userId, Guid groupId, string roleName)
+		private Participant(string userId, Guid groupId, string roleName)
 		{
 			UserId = userId;
 			GroupId = groupId;
 			RoleName = roleName;
-			JoinedAt = DateTime.Now;
+			JoinedAt = DateTime.UtcNow;
 		}
 
-		public static Participants Create(string userId, Guid groupId, string roleName)
+		public static Participant Create(string userId, Guid groupId, string roleName)
 		{
-			return new Participants(userId, groupId, roleName);
+			return new Participant(userId, groupId, roleName);
 		}
 		public void Mute() => IsMuted = true;
 		public void UnMute() => IsMuted = false;
 
-		private Participants()
+		private Participant()
 		{
 		}
 	}

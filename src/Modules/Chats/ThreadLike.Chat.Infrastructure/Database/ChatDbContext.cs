@@ -40,7 +40,7 @@ namespace ThreadLike.Chat.Infrastructure.Database
 		public DbSet<GroupRole> GroupRoles { get; set; }
 
 		public DbSet<Group> Groups { get; set; }
-		public DbSet<Participants> UserGroupRoles { get; set; }
+		public DbSet<Participant> Participants { get; set; }
 
 		public DbSet<Reaction> Reactions { get; set; }
 		
