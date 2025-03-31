@@ -30,4 +30,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logfiles\Chats\" />
+  </ItemGroup>
+
 </Project>

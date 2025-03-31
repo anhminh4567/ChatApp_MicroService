@@ -20,9 +20,19 @@ namespace ThreadLike.Chat.Infrastructure.Users
 			_cacheService = cacheService;
 		}
 
-		public Task<bool> Exist(List<string> userIds, CancellationToken cancellationToken = default)
+		public override Task<User?> GetById(params object[] ids)
 		{
-			return _set.AllAsync(x => userIds.Contains(x.Id), cancellationToken);
+			return _set.Where(x => x.Id == (string)ids[0])
+				.Include(x => x.Friends)
+				.Include(x => x.Letters)
+				.FirstOrDefaultAsync();
+		}
+
+		public async Task<bool> Exist(List<string> userIds, CancellationToken cancellationToken = default)
+		{
+			int count = await _set.Where(x => userIds.Contains(x.Id))
+				.CountAsync(cancellationToken);
+			return count == userIds.Count;
 		}
 
 		public Task<User?> GetByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default)

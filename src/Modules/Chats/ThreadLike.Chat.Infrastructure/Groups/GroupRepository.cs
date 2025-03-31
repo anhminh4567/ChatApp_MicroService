@@ -19,6 +19,11 @@ namespace ThreadLike.Chat.Infrastructure.Groups
             _cacheService = cacheService;
         }
 
+		public override Task<Group?> GetById(params object[] ids)
+		{
+			return _set.Where(x => x.Id == (Guid)ids[0]).Include(x => x.Participants).FirstOrDefaultAsync();
+		}
+
 		public async Task<List<Group>> GetGroupsForUser(User user, CancellationToken token = default)
 		{
 			List<Group> result = await (from participant in _dbContext.Participants

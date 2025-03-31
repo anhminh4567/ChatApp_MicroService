@@ -13,7 +13,7 @@ using ThreadLike.Chat.Domain.Users;
 
 namespace ThreadLike.Chat.UnitTest.Groups
 {
-    public class GroupTest
+    public class GroupDomainTest
     {
 		private readonly Faker _faker = new();
 		[Fact]

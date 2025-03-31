@@ -22,4 +22,8 @@
     <ProjectReference Include="..\ThreadLike.User.Infrastructure\ThreadLike.User.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logfiles\Users\" />
+  </ItemGroup>
+
 </Project>
