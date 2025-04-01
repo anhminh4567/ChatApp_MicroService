@@ -36,13 +36,20 @@ namespace ThreadLike.Chat.Domain.Messages
 		{
 			return new Message(Guid.NewGuid(), senderId, group.Id, content, referenceMessage?.Id, DateTime.UtcNow);
 		}
+
 		public void Delete()
 		{
 			DeletedAt = DateTime.UtcNow;
+			MessageAttachments.Clear();
+			MessageReactions.Clear();
 		}
 		public void SetAttachment(MessageAttachment attachment)
 		{
 			MessageAttachments.Add(attachment);
+		}
+		public void SetReaction(MessageReaction reaction)
+		{
+			MessageReactions.Add(reaction);
 		}
 		private Message()
 		{

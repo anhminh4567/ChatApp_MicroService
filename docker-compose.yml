@@ -2,14 +2,14 @@ services:
 
   threadlike.redis:
     image: redis:latest
-    container_name: threadlike.Redis
+    container_name: threadlike.redis
     restart: always
     ports:
       - 6200:6379
 
   threadlike.queue:
     image: rabbitmq:management-alpine
-    container_name: threadlike.Queue
+    container_name: threadlike.queue
     hostname: threadlike-queue
     volumes:
         - ./.containers/queue/data/:/var/lib/rabbitmq

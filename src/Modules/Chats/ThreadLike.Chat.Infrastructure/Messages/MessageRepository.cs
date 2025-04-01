@@ -22,6 +22,15 @@ namespace ThreadLike.Chat.Infrastructure.Messages
 				.ToListAsync(token);
 		}
 
+		public Task<Message?> GetByIdAndGroup(Guid id, Guid groupId, CancellationToken token = default)
+		{
+			return _dbContext.Messages
+				.Where(x => x.GroupId == groupId && x.Id == id)
+				.Include(x => x.MessageAttachments)
+				.Include(x => x.MessageReactions)
+				.FirstOrDefaultAsync(token);
+		}
+
 		public Task<List<Message>> GetFromGroupPaging(Guid groupId, int skip, int take, CancellationToken token = default)
 		{
 			return _dbContext.Messages.Where(x => x.GroupId == groupId)

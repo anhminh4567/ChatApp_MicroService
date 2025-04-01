@@ -22,7 +22,7 @@ namespace ThreadLike.Chat.Domain.Messages.Entities
 			AttachmentDetail = attachmentDetail;
 			ThumbDetail = thumbDetail;
 		}
-		public static MessageAttachment Create(Message Message, MediaObject attachmentDetail, MediaObject? thumbDetail)
+		public static MessageAttachment Create(Message Message, MediaObject attachmentDetail, MediaObject? thumbDetail = null)
 		{
 			return new MessageAttachment(IdGenUltils.GetIdGen(9), Message.Id, attachmentDetail, thumbDetail);
 		}

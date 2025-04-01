@@ -14,6 +14,11 @@ namespace ThreadLike.Chat.Api.Controllers
 		{
 			return Task.FromResult(Results.Ok(DateTime.UtcNow));
 		}
+		[HttpGet("GetTimeZone")]
+		public Task<IResult> GetTimeZone()
+		{
+			return Task.FromResult(Results.Ok(TimeZoneInfo.Local));
+		}
 		[HttpGet("roles/{identityId}/test")]
 		[AllowAnonymous]
 		public async Task<IResult> GetUserRoleTest([FromServices] IServiceProvider sp, [FromRoute] string identityId)

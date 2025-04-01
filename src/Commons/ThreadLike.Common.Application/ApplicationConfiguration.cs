@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
+using Dapper;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using ThreadLike.Common.Application.Behaviors;
+using ThreadLike.Common.Application.DapperTypeHandlers;
 using ThreadLike.Common.Application.Messaging;
 
 namespace ThreadLike.Common.Application
@@ -20,7 +22,7 @@ namespace ThreadLike.Common.Application
 			});
 			services.AddValidatorsFromAssemblies(modulesAssemblies, includeInternalTypes: true);
 
-			
+			//SqlMapper.AddTypeHandler(new JsonTypeHandler<JsonDocument>());
 			return services;
 		}
 	}

@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace ThreadLike.Chat.Infrastructure.Groups
 {
-    internal class GroupRepository : BaseRepository<Group, ChatDbContext>, IGroupRepository
+	internal class GroupRepository : BaseRepository<Group, ChatDbContext>, IGroupRepository
     {
         private readonly ICacheService _cacheService;
 
@@ -32,6 +32,21 @@ namespace ThreadLike.Chat.Infrastructure.Groups
 						 from p in joined.DefaultIfEmpty()
 						 select p).ToListAsync(token);
 			return result;
+		}
+
+		public Task<List<Participant>> GetParticipantsForGroup(Group group, CancellationToken token = default)
+		{
+			return _dbContext.Participants
+				.Where(x => x.GroupId == group.Id)
+				.ToListAsync(token);
+		}
+
+		public Task<bool> IsParticipantsCorrect(List<string> participantsId, Group groupToCheckAgainst, CancellationToken token = default)
+		{
+			return _dbContext.Participants
+				.Where(x => x.GroupId == groupToCheckAgainst.Id && participantsId.Contains(x.UserId) )
+				.CountAsync(token)
+				.ContinueWith(x => x.Result == participantsId.Count);
 		}
 	}
 }
