@@ -1,4 +1,4 @@
-﻿namespace ThreadLike.Common.Infrastructure.Authentication;
+﻿namespace ThreadLike.Common.Application.Authentication;
 
 public static class CustomClaims
 {

@@ -20,8 +20,10 @@ using ThreadLike.Chat.Infrastructure.GroupRoles;
 using ThreadLike.Chat.Infrastructure.Groups;
 using ThreadLike.Chat.Infrastructure.Inbox;
 using ThreadLike.Chat.Infrastructure.Messages;
+using ThreadLike.Chat.Infrastructure.Options;
 using ThreadLike.Chat.Infrastructure.Outbox;
 using ThreadLike.Chat.Infrastructure.Reactions;
+using ThreadLike.Chat.Infrastructure.Services;
 using ThreadLike.Chat.Infrastructure.Users;
 using ThreadLike.Common.Application.Authorization;
 using ThreadLike.Common.Application.EventBus;
@@ -58,12 +60,17 @@ namespace ThreadLike.Chat.Infrastructure
 			services.AddScoped<IReactionRepository, ReactionRepository>();
 			services.AddScoped<IUserRepository, UserRepository>();
 
+			services.AddScoped<IGroupChatService, GroupChatService>();
+
 			services.AddInboxOutbox(configuration);
 
 			services.DecorateDomainEventHandlers(configuration);
 
 			services.DecorateIntegrationEventHandlers(configuration);
+
+			services.AddConfigureOptions(configuration);
 			return services;
+
 		}
 		private static void AddInboxOutbox(this IServiceCollection services, IConfiguration configuration)
 		{
@@ -73,6 +80,11 @@ namespace ThreadLike.Chat.Infrastructure
 			services.Configure<InboxOptions>(configuration.GetSection(InboxOptions.SectionName));
 			services.ConfigureOptions<ConfigureProcessInboxJob>();
 		}
+		private static void AddConfigureOptions(this IServiceCollection services,IConfiguration configuration)
+		{
+			services.ConfigureOptions<JwtBearerConfigurationForSignalR>();
+		}
+
 		private static void DecorateDomainEventHandlers(this IServiceCollection services, IConfiguration configuration)
 		{
 			Type[] domainEventHandlers = _applicationAssembly

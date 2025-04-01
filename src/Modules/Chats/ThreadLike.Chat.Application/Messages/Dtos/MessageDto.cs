@@ -14,6 +14,6 @@ namespace ThreadLike.Chat.Application.Messages.Dtos
 		}
 
 	}
-	public record MessageDto(string SenderId, string Content, Guid? ReferenceMessageId, List<MessageAttachmentDto>? Attachments = null , List< MessageReaction>);
+	public record MessageDto(string SenderId, string Content, Guid? ReferenceMessageId, List<MessageAttachmentDto>? Attachments = null );
 	
 }

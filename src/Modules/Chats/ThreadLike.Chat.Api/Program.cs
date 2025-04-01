@@ -10,6 +10,8 @@ using ThreadLike.Chat.Api.Extensions;
 using ThreadLike.Chat.Api;
 using ThreadLike.Chat.Api.Consumers;
 using MassTransit;
+using ThreadLike.Chat.Infrastructure.Options;
+using ThreadLike.Chat.Infrastructure.Hubs;
 internal class Program
 {
 	private static void Main(string[] args)
@@ -57,6 +59,7 @@ internal class Program
 		builder.Services.AddScoped<CustomExceptionHandlerMiddleware>();
 		builder.Services.AddScoped<LogContextTraceLoggingMiddleware>();
 
+
 		string? rabbitMqHost = builder.Configuration.GetConnectionString("Queue");
 		ArgumentException.ThrowIfNullOrEmpty(rabbitMqHost);
 		var rabbitMqSettings = new RabbitMqSettings()
@@ -82,6 +85,17 @@ internal class Program
 			}]);
 		builder.Services.AddChatInfrastructure(builder.Configuration);
 
+		builder.Services.AddCors(setup =>
+		{
+			setup.AddPolicy("AllowClient", policy =>
+			{
+				policy.WithOrigins("http://localhost:3100")
+					.AllowAnyHeader()
+					.AllowAnyMethod()
+					.AllowCredentials();
+			});
+		});
+		builder.Services.AddSignalR();
 
 
 		WebApplication app = builder.Build();
@@ -94,6 +108,8 @@ internal class Program
 			app.UseDeveloperExceptionPage();
 			app.SeedIcons();
 		}
+		app.UseCors("AllowClient");
+
 		app.UseMiddleware<LogContextTraceLoggingMiddleware>();
 
 		app.UseSerilogRequestLogging(options =>
@@ -111,7 +127,10 @@ internal class Program
 		app.UseAuthentication();
 
 		app.UseAuthorization();
+
 		app.MapControllers();
+		
+		app.MapHub<GroupChatHub>($"{JwtBearerConfigurationForSignalR.HubStartSegment}/group-chat");
 
 		app.Run();
 	}

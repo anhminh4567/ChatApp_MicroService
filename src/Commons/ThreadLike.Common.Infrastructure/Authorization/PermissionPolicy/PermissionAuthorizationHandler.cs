@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using ThreadLike.Common.Infrastructure.Authentication;
+using ThreadLike.Common.Application.Authentication;
 
 namespace ThreadLike.Common.Infrastructure.Authorization.PermissionPolicy;
 

@@ -1,11 +1,11 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
+using ThreadLike.Common.Application.Authentication;
 using ThreadLike.Common.Application.Authorization;
 using ThreadLike.Common.Application.Authorization.Response;
 using ThreadLike.Common.Application.Exceptions;
 using ThreadLike.Common.Domain;
-using ThreadLike.Common.Infrastructure.Authentication;
 
 namespace ThreadLike.Common.Infrastructure.Authorization.PermissionPolicy;
 
@@ -26,7 +26,10 @@ internal sealed class PermissionClaimsTransformation : IClaimsTransformation
 		using IServiceScope scope = _serviceScopeFactory.CreateScope();
 		// this is our service, not from microsoft
 		IAuthorizationService permissionService = scope.ServiceProvider.GetRequiredService<IAuthorizationService>();
-		string identityId = principal.GetIdentityId(); // this is an extension method ( no need to care )
+		string? identityId = principal.GetIdentityId(); // this is an extension method ( no need to care )
+
+		if(identityId == null)
+			throw new TheadlikeApplicationException("User identity is unavailable");
 
 		Result<PermissionsResponse> result = await permissionService.GetUserPermissionsAsync(identityId);
 		if (result.IsFailure)

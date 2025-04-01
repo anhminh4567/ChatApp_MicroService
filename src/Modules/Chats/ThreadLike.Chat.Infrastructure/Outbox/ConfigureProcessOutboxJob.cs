@@ -3,8 +3,8 @@ using Quartz;
 
 namespace ThreadLike.Chat.Infrastructure.Outbox;
 
-internal sealed class ConfigureProcessOutboxJob(IOptions<OutboxOptions> outboxOptions)
-	: IConfigureOptions<QuartzOptions>
+internal sealed class ConfigureProcessOutboxJob(
+	IOptions<OutboxOptions> outboxOptions): IConfigureOptions<QuartzOptions>
 {
 	private readonly OutboxOptions _outboxOptions = outboxOptions.Value;
 

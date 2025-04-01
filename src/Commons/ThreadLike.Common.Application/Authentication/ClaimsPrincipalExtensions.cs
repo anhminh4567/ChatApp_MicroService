@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace ThreadLike.Common.Infrastructure.Authentication;
+namespace ThreadLike.Common.Application.Authentication;
 
 
 // use to modify the incomming accceess token
@@ -14,10 +14,15 @@ public static class ClaimsPrincipalExtensions
 	//	email -> ClaimTypes.Email
 	//	role -> ClaimTypes.Role
 
-	public static string GetIdentityId(this ClaimsPrincipal? principal)
+	public static string? GetIdentityId(this ClaimsPrincipal? principal)
 	{
-		return principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
-			   throw new ApplicationException("User identity is unavailable");
+		return principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;//??
+			   //throw new ApplicationException("User identity is unavailable");
+	}
+	public static string? GetUserId(this ClaimsPrincipal? principal)
+	{
+		return principal?.FindFirst(CustomClaims.UserId)?.Value;//??
+															//throw new ApplicationException("User identity is unavailable");
 	}
 	public static HashSet<string> GetScopes(this ClaimsPrincipal principal)
 	{
@@ -32,9 +37,8 @@ public static class ClaimsPrincipalExtensions
 
 		return roleClaim.Select(c => c.Value).ToHashSet();
 	}
-	public static string GetEmail(this ClaimsPrincipal principal) 
-		=> principal.FindFirst(ClaimTypes.Email)?.Value ??
-			throw new ApplicationException("Email is unavailable");
+	public static string? GetEmail(this ClaimsPrincipal principal) => principal.FindFirst(ClaimTypes.Email)?.Value;// ??
+			///throw new ApplicationException("Email is unavailable");
 	public static HashSet<string> GetPermissions(this ClaimsPrincipal? principal)
 	{
 		IEnumerable<Claim> permissionClaims = principal?.FindAll(CustomClaims.Permission) ??
