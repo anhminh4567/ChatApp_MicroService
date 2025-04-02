@@ -9,6 +9,12 @@ namespace ThreadLike.Chat.Domain.Groups
 {
     public static class GroupErrors
     {
+		public static class ParticipantErrors
+		{
+			public static Error NotFound => Error.NotFound("404", "Participant not found");
+			public static Error AlreadyExists => Error.Conflict("409", "Participant already exists");
+			public static Error IsNotGroupLeader(string id) => Error.Conflict( "403", $"User id {id} is not group leader");
+		}
 		public static Error Exist(string name) => Error.Conflict("409", $"Group with name {name} already exists");
 		public static Error IdExist(string id) => Error.Conflict("409", $"Group with id {id} already exists");
 		public static Error NotFound => Error.NotFound("404", "Group not found");

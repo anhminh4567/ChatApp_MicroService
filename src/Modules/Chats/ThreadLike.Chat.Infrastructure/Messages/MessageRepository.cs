@@ -3,6 +3,7 @@ using ThreadLike.Common.Application.Caching;
 using ThreadLike.Common.Infrastructure.Repositories;
 using ThreadLike.Chat.Domain.Messages;
 using ThreadLike.Chat.Infrastructure.Database;
+using ThreadLike.Chat.Domain.Messages.Entities;
 
 namespace ThreadLike.Chat.Infrastructure.Messages
 {
@@ -39,6 +40,14 @@ namespace ThreadLike.Chat.Infrastructure.Messages
 				.Skip(skip)
 				.Take(take)
 				.ToListAsync(token);
+		}
+
+		public Task<List<MessageReaction>> GetMessageReactions(Guid messageId, CancellationToken token = default)
+		{
+			return _dbContext.MessageReactions
+				.Where(x => x.MesssageId == messageId)
+				.ToListAsync(token);
+
 		}
 	}
 }

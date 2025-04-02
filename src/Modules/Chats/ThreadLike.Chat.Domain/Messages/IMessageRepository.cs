@@ -1,3 +1,4 @@
+using ThreadLike.Chat.Domain.Messages.Entities;
 using ThreadLike.Common.Domain;
 
 namespace ThreadLike.Chat.Domain.Messages
@@ -9,5 +10,7 @@ namespace ThreadLike.Chat.Domain.Messages
 		Task<List<Message>> GetAllFromGroup(Guid groupId, CancellationToken token = default);
 
 		Task<List<Message>> GetFromGroupPaging(Guid groupId, int skip, int take, CancellationToken token = default);
+
+		Task<List<MessageReaction>> GetMessageReactions(Guid messageId, CancellationToken token = default);
 	}
 }

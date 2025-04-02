@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using ThreadLike.Chat.Domain.Groups;
@@ -43,13 +44,19 @@ namespace ThreadLike.Chat.Domain.Messages
 			MessageAttachments.Clear();
 			MessageReactions.Clear();
 		}
-		public void SetAttachment(MessageAttachment attachment)
+		public void SetAttachment(MessageAttachment attachment, bool isRemove = false)
 		{
-			MessageAttachments.Add(attachment);
+			if (isRemove)
+				MessageAttachments.Remove(attachment);
+			else
+				MessageAttachments.Add(attachment);
 		}
-		public void SetReaction(MessageReaction reaction)
+		public void SetReaction(MessageReaction reaction, bool isRemove = false)
 		{
-			MessageReactions.Add(reaction);
+			if(isRemove)
+				MessageReactions.Remove(reaction);
+			else
+				MessageReactions.Add(reaction);
 		}
 		private Message()
 		{

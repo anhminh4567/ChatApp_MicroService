@@ -22,6 +22,10 @@ namespace ThreadLike.Chat.Domain.Users
 		public List<Message> Messages { get; private set; } = new();
 		public List<UserFriend> Friends { get; private set; } = new();
 		public List<UserLetter> Letters { get; private set; } = new();
+		private User()
+		{
+			// Required by EF
+		}
 		protected User(string id, string name, string email, string identityId, string? avatarUri, DateTime createdAt, DateTime updatedAt)
 		{
 			Id = id;

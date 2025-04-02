@@ -51,7 +51,7 @@ namespace ThreadLike.Chat.Application.Messages.Commands.AddManyToGroup
 				{
 					List<MessageAttachment> attachments = requestMessage.Attachments
 						.Select(x => MessageAttachment.Create(message, new MediaObject(x.FileName,x.ContentType,"not yet added IFileProvider function"))).ToList();
-					attachments.ForEach(message.SetAttachment);
+					attachments.ForEach(a => message.SetAttachment(a,false));
 				}
 
 				response.Add(message); 

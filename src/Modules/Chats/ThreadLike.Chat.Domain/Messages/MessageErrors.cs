@@ -8,6 +8,10 @@ namespace ThreadLike.Chat.Domain.Messages
 {
     public static class MessageErrors
     {
+		public static class ReactionErrors
+		{
+			public static string NotFound => "Reaction not found";
+		}
 		public static string NotFound => "Message not found";
 		public static string NotBelongToGroup => "Message not belong to group";
 		public static string NotBelongToUser => "Message not belong to user";

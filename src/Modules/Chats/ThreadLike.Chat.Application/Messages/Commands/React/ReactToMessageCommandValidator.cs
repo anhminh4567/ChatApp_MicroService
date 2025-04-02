@@ -9,6 +9,7 @@ namespace ThreadLike.Chat.Application.Messages.Commands.React
 			RuleFor(x => x.MessageId).NotEmpty();
 			RuleFor(x => x.ReactionId).NotEmpty();
 			RuleFor(x => x.ReactorId).NotEmpty();
+			RuleFor(x => x.GroupId).NotEmpty();
 		}
 	}
 }
