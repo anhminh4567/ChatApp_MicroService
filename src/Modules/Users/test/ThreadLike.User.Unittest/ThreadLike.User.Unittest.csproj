@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ThreadLike.User.Application\ThreadLike.User.Application.csproj" />
-    <ProjectReference Include="..\ThreadLikeAppWithRealTime\src\Modules\Users\ThreadLike.User.Domain\ThreadLike.User.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
