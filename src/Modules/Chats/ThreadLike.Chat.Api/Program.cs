@@ -12,6 +12,10 @@ using ThreadLike.Chat.Api.Consumers;
 using MassTransit;
 using ThreadLike.Chat.Infrastructure.Options;
 using ThreadLike.Chat.Infrastructure.Hubs;
+using ThreadLike.Common.Domain.Shares;
+using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using ThreadLike.Common.Api;
 internal class Program
 {
 	private static void Main(string[] args)
@@ -23,7 +27,7 @@ internal class Program
 		{
 			config.ReadFrom.Configuration(builder.Configuration);
 		}, false, false);
-		builder.Services.AddControllers();
+		
 		// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 		builder.Services.AddEndpointsApiExplorer();
@@ -85,19 +89,25 @@ internal class Program
 			}]);
 		builder.Services.AddChatInfrastructure(builder.Configuration);
 
-		builder.Services.AddCors(setup =>
+		//builder.Services.AddCors(setup =>
+		//{
+		//	setup.AddPolicy("AllowClient", policy =>
+		//	{
+		//		policy.WithOrigins("http://localhost:3100")
+		//			.AllowAnyHeader()
+		//			.AllowAnyMethod()
+		//			.AllowCredentials();
+		//	});
+		//});
+		// some service configure for api layer, lilke CORS ( in future, shared middleware )
+		builder.Services.AddApiModule(builder.Configuration);
+
+		builder.Services.AddControllers();
+		builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
 		{
-			setup.AddPolicy("AllowClient", policy =>
-			{
-				policy.WithOrigins("http://localhost:3100")
-					.AllowAnyHeader()
-					.AllowAnyMethod()
-					.AllowCredentials();
-			});
+			options.SerializerOptions.PropertyNameCaseInsensitive = false;
+			options.SerializerOptions.PropertyNamingPolicy = null;
 		});
-		builder.Services.AddSignalR();
-
-
 		WebApplication app = builder.Build();
 
 		// Configure the HTTP request pipeline.
@@ -108,7 +118,7 @@ internal class Program
 			app.UseDeveloperExceptionPage();
 			app.SeedIcons();
 		}
-		app.UseCors("AllowClient");
+		app.UseCors(CorsPolicy.AllowClientSPA);
 
 		app.UseMiddleware<LogContextTraceLoggingMiddleware>();
 

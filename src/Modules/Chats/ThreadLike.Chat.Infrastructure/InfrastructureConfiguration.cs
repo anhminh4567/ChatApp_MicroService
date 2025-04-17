@@ -30,7 +30,6 @@ using ThreadLike.Common.Application.EventBus;
 using ThreadLike.Common.Infrastructure.Authentication;
 using ThreadLike.Common.Infrastructure.Outbox;
 
-
 namespace ThreadLike.Chat.Infrastructure
 {
 	public static class InfrastructureConfiguration
@@ -69,8 +68,23 @@ namespace ThreadLike.Chat.Infrastructure
 			services.DecorateIntegrationEventHandlers(configuration);
 
 			services.AddConfigureOptions(configuration);
+
+			services.AddRealTimeCommunication(configuration);
+
 			return services;
 
+		}
+		private static void AddRealTimeCommunication(this IServiceCollection services,IConfiguration configuration)
+		{
+			string? redisConnectionString = configuration.GetConnectionString("Cache");
+			ArgumentNullException.ThrowIfNull(redisConnectionString, "Redis connection string is required for real-time communication");
+			services.AddSignalR()
+				.AddJsonProtocol()
+				.AddStackExchangeRedis(redisConnectionString, options =>
+				{
+					options.Configuration.ChannelPrefix = "signalr";
+					options.Configuration.DefaultDatabase = 1;
+				});
 		}
 		private static void AddInboxOutbox(this IServiceCollection services, IConfiguration configuration)
 		{

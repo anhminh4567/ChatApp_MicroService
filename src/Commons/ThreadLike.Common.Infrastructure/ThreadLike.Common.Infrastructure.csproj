@@ -32,6 +32,9 @@
 		<!--<PackageReference Include="Scrutor" Version="6.0.1" />-->
 
 		<PackageReference Include="Npgsql" Version="8.0.6" />
-
+		<!--lock package-->
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.5.1" />
+		<PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="7.5.1" />
+		<!--lock package-->
 	</ItemGroup>
 </Project>

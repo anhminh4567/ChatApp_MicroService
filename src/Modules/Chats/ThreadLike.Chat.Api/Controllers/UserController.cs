@@ -30,6 +30,7 @@ namespace ThreadLike.Chat.Api.Controllers
 
 		[HttpGet("{id}")]
 		[AllowAnonymous]
+		[Produces(typeof(User))]
 		public async Task<IResult> GetUserDetail([FromRoute] string id)
 		{
 			Result<User> result = await _mediator.Send(new GetUserDetailQuery(id));
@@ -40,5 +41,7 @@ namespace ThreadLike.Chat.Api.Controllers
 			}
 			return Results.Ok(result.Value);
 		}		
+
+		
 	}
 }

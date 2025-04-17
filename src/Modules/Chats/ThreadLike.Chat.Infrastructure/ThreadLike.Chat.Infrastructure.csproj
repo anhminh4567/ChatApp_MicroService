@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="8.0.13" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Commons\ThreadLike.Common.Infrastructure\ThreadLike.Common.Infrastructure.csproj" />
     <ProjectReference Include="..\ThreadLike.Chat.Application\ThreadLike.Chat.Application.csproj" />
   </ItemGroup>

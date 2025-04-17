@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using ThreadLike.Common.Api;
 using ThreadLike.Common.Application;
 using ThreadLike.Common.Infrastructure;
 using ThreadLike.Common.Infrastructure.EventBuses;
@@ -65,7 +66,7 @@ var rabbitMqSettings = new RabbitMqSettings()
 builder.Services.AddApplication([typeof(ThreadLike.User.Application.ApplicationConfiguration).Assembly]);
 builder.Services.AddUserApplication();
 // Add infra
-
+builder.Services.AddApiModule(builder.Configuration);
 
 builder.Services.AddInfrastructure(builder.Configuration, rabbitMqSettings, UserModuleMetaData.ServiceName,
 	[(config, instanceId) => 
@@ -73,7 +74,11 @@ builder.Services.AddInfrastructure(builder.Configuration, rabbitMqSettings, User
 		config.AddConsumer<GetUserRolesRequestConsummer>().Endpoint(e => e.InstanceId = instanceId ); 
 	}]);
 builder.Services.AddUserInfrastructure(builder.Configuration);
-
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+	options.SerializerOptions.PropertyNameCaseInsensitive = false;
+	options.SerializerOptions.PropertyNamingPolicy = null;
+});
 
 var app = builder.Build();
 
@@ -87,6 +92,8 @@ if (app.Environment.IsDevelopment())
 	app.UseDeveloperExceptionPage();
 }
 // use static file have alot of noise so it should not be logged, and placed beefore useSeriologRequestLogging
+
+app.UseCors(CorsPolicy.AllowClientSPA);
 
 
 app.UseMiddleware<LogContextTraceLoggingMiddleware>();

@@ -26,4 +26,5 @@ public interface IIdentityProviderService
 	//Task<IdentityProviderTokenResponse> GetTokenFromAuthorizationCode 
 	Task<Result<IdentityProviderTokenResponse>> ExchangeCodeForTokenAsync(string code, CancellationToken cancellationToken = default);
 	Task<Result<IdentityProviderUserInfo>> GetUserInfoAsync(string accessToken, CancellationToken cancellationToken = default);
+	Task<Result<IdentityProviderUserInfo>> GetUserInforFromIdTokenAsync(string idToken, CancellationToken cancellationToken = default);
 }

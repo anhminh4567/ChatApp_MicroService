@@ -33,12 +33,15 @@ internal class JwtBearerConfigureOptions : IConfigureNamedOptions<JwtBearerOptio
 		option.TokenValidationParameters.ValidateIssuer = true;
 		option.TokenValidationParameters.ValidateAudience = false;
 		option.TokenValidationParameters.ValidateLifetime = true;
-
 		option.TokenValidationParameters.ValidateIssuerSigningKey = true;
-		
+
+		option.SaveToken = true;
+
 		option.IncludeErrorDetails = true;
 
 		option.TokenValidationParameters.ValidIssuers = [issuer];
+		option.TokenValidationParameters.ValidAudiences = [authOptions.ClientId];
+
 		//_configuration.GetSection(ConfigurationSectionName).Bind(options);
 	}
 }
