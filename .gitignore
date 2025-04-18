@@ -404,3 +404,6 @@ FodyWeavers.xsd
 
 LogFile*
 .env
+
+# Ignore appsettings.secret.json
+appsettings.Secret.json
