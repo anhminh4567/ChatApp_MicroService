@@ -21,6 +21,7 @@ namespace ThreadLike.Chat.Application.Messages.Commands.AddManyToGroup
 	internal class AddNewMessagesToGroupCommandHandler(
 		IGroupRepository groupRepository,
 		IUserRepository userRepository,
+		IFilesStorageService filesStorageService,
 		IMessageRepository messageRepository,
 		IUnitOfWork unitOfWork) : ICommandHandler<AddNewMessagesToGroupCommand,Result<List<Message>>>
 	{

@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using Azure.Storage.Blobs;
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -29,7 +30,6 @@ using ThreadLike.Common.Application.Authorization;
 using ThreadLike.Common.Application.EventBus;
 using ThreadLike.Common.Infrastructure.Authentication;
 using ThreadLike.Common.Infrastructure.Outbox;
-
 namespace ThreadLike.Chat.Infrastructure
 {
 	public static class InfrastructureConfiguration
@@ -71,8 +71,45 @@ namespace ThreadLike.Chat.Infrastructure
 
 			services.AddRealTimeCommunication(configuration);
 
+			services.AddBlobFileStorage(configuration);
+
 			return services;
 
+		}
+		private static void AddBlobFileStorage(this IServiceCollection services, IConfiguration configuration)
+		{
+			//const string BLOB_CONNECTION_STRING_ENV = "CHATAPP_AZURE_BLOB_CONNECTION_STRING";
+
+			//string? connectionString = Environment.GetEnvironmentVariable(BLOB_CONNECTION_STRING_ENV,EnvironmentVariableTarget.User);
+
+			//ArgumentException.ThrowIfNullOrEmpty(connectionString, "Blob storage connection string is required for file storage");
+
+			services.Configure<AzureBlobStorageOptions>(configuration.GetSection(AzureBlobStorageOptions.SectionName));
+
+			services.PostConfigure<AzureBlobStorageOptions>(options =>
+			{
+				Console.WriteLine(options.ConnectionString);
+			});
+
+			services.AddSingleton((IServiceProvider serviceProvider) =>
+			{
+				var getOption = serviceProvider.GetRequiredService<IOptions<AzureBlobStorageOptions>>();
+				if (getOption is null)
+					throw new ArgumentNullException();
+				AzureBlobStorageOptions option = getOption.Value;
+				var newClient = new BlobServiceClient(option.ConnectionString, new BlobClientOptions() 
+				{
+					Retry =
+					{
+						MaxRetries = 2,
+						Mode = Azure.Core.RetryMode.Fixed,
+						Delay = TimeSpan.FromSeconds(5),
+					}
+				});
+
+				return newClient;
+			});
+			services.AddScoped<IFilesStorageService, AzureBlobFileStorageService>();
 		}
 		private static void AddRealTimeCommunication(this IServiceCollection services,IConfiguration configuration)
 		{

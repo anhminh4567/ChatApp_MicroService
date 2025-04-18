@@ -2,10 +2,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ThreadLike.Chat.Application.Users.Commands.ChangeAvatar;
 using ThreadLike.Chat.Application.Users.Queries.GetAll;
 using ThreadLike.Chat.Application.Users.Queries.GetDetail;
 using ThreadLike.Chat.Domain.Users;
 using ThreadLike.Common.Api;
+using ThreadLike.Common.Application.Authentication;
 using ThreadLike.Common.Contracts;
 using ThreadLike.Common.Domain;
 
@@ -40,8 +42,27 @@ namespace ThreadLike.Chat.Api.Controllers
 				return ApiResult.MatchError(result.Error);
 			}
 			return Results.Ok(result.Value);
-		}		
+		}
 
+		[HttpPut("avatar")]
+		[Authorize]
+		[ProducesResponseType(typeof(string),200)]
+		public async Task<IResult> UpdateAvatar([FromForm] ChangeAvatarRequest request)
+		{
+			if(User.GetIdentityId() != request.identityId)
+			{
+				return Results.Unauthorized();
+			}
+			using Stream stream = request.image.OpenReadStream();
+			Result<string> result = await _mediator.Send(new ChangeUserAvatarCommand(request.identityId, stream, request.image.ContentType));
+			if (result.IsFailure)
+			{
+				return ApiResult.MatchError(result.Error);
+			}
+			return Results.Ok(result.Value);
+		}
 		
+
+		public record ChangeAvatarRequest(string identityId, IFormFile image);
 	}
 }

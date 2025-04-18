@@ -28,6 +28,12 @@ internal class Program
 			config.ReadFrom.Configuration(builder.Configuration);
 		}, false, false);
 		
+		if(builder.Environment.IsDevelopment())
+		{
+			builder.Configuration.AddJsonFile("appsettings.Secret.Json");
+		}
+
+
 		// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 		builder.Services.AddEndpointsApiExplorer();
