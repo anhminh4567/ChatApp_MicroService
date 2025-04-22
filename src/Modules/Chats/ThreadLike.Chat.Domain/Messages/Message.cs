@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using ThreadLike.Chat.Domain.Groups;
+using ThreadLike.Chat.Domain.Messages.DomainEvents;
 using ThreadLike.Chat.Domain.Messages.Entities;
 using ThreadLike.Common.Domain;
 
@@ -35,7 +36,11 @@ namespace ThreadLike.Chat.Domain.Messages
 
 		public static Message Create( string senderId, Group group, string content, Message? referenceMessage = null)
 		{
-			return new Message(Guid.NewGuid(), senderId, group.Id, content, referenceMessage?.Id, DateTime.UtcNow);
+			var newMessage = new  Message(Guid.NewGuid(), senderId, group.Id, content, referenceMessage?.Id, DateTime.UtcNow);
+
+			newMessage.Raise(new MessageBroadcastDomainEvent(group.Id, newMessage));
+
+			return newMessage;
 		}
 
 		public void Delete()

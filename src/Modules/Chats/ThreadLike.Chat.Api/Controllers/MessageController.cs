@@ -58,7 +58,7 @@ namespace ThreadLike.Chat.Api.Controllers
 			{
 				foreach (IFormFile attachment in commandDto.attachments)
 				{
-					using Stream stream = attachment.OpenReadStream();
+					 Stream stream = attachment.OpenReadStream();
 
 					commandMessage.Attachments!.Add(new MessageAttachmentDto(attachment.FileName, attachment.ContentType, stream));
 				}

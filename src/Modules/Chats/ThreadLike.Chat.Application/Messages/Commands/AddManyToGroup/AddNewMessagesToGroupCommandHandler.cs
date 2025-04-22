@@ -23,8 +23,18 @@ namespace ThreadLike.Chat.Application.Messages.Commands.AddManyToGroup
 		IUserRepository userRepository,
 		IFilesStorageService filesStorageService,
 		IMessageRepository messageRepository,
+		IGroupChatService groupChatService,
 		IUnitOfWork unitOfWork) : ICommandHandler<AddNewMessagesToGroupCommand,Result<List<Message>>>
 	{
+		public static string GetMessageAttachmentBlobPath(Guid groupId, Guid messageId,string extension)
+		{
+			if(extension.StartsWith("."))
+			{
+				extension = extension.Substring(1);
+			}
+			string fileName = $"{messageId.ToString().ToLower()}_{DateTime.UtcNow.Ticks}.{extension}";
+			return $"{groupId}/{messageId}/attachments/{fileName}";
+		}
 		public async Task<Result<List<Message>>> Handle(AddNewMessagesToGroupCommand request, CancellationToken cancellationToken)
 		{
 			// should orderBy() beefore process
@@ -50,17 +60,32 @@ namespace ThreadLike.Chat.Application.Messages.Commands.AddManyToGroup
 
 				if (requestMessage.Attachments != null && requestMessage.Attachments.Any())
 				{
-					List<MessageAttachment> attachments = requestMessage.Attachments
-						.Select(x => MessageAttachment.Create(message, new MediaObject(x.FileName,x.ContentType,"not yet added IFileProvider function"))).ToList();
-					attachments.ForEach(a => message.SetAttachment(a,false));
-				}
+					foreach (var attachment in requestMessage.Attachments)
+					{
+						attachment.FileStream.Seek(0, SeekOrigin.Begin);
+						string relativeFilePath = await filesStorageService.UploadFileAsync(
+							IFilesStorageService.PUBLIC_CONTAINER,
+							GetMessageAttachmentBlobPath(message.GroupId, message.Id, Path.GetExtension(attachment.FileName)),
+							attachment.ContentType,
+							attachment.FileStream,
+							cancellationToken);
+						
+						var newAttachment = MessageAttachment.Create(message, new MediaObject(
+							attachment.FileName,
+							attachment.ContentType,
+							relativeFilePath));
 
-				response.Add(message); 
+						message.SetAttachment(newAttachment);
+					}
+				}
+					
+				response.Add(message);
+				
 
 				messageRepository.Create(message);
 			}
 			await unitOfWork.SaveChangesAsync(cancellationToken);
-
+			await groupChatService.SendGroupMessage(group.Id, response);
 			return response;
 		}
 	}

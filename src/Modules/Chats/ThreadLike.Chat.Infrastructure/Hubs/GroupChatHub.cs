@@ -31,6 +31,14 @@ namespace ThreadLike.Chat.Infrastructure.Hubs
 				Context.Abort();
 				return;
 			}
+			List<Domain.Groups.Group> groups = (await groupRepository.GetGroupsForUser(user));
+			// add user to the group connection to listen to incomming messages
+			groups.ForEach(async g =>
+			{
+				await Groups.AddToGroupAsync(Context.ConnectionId, g.Id.ToString());
+				//await Clients.Group(g.Name).Joined(g.Id, user);
+			});
+
 
 			logger.LogInformation("User with connect {connectionid} connected", Context.ConnectionId);
 		}

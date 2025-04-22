@@ -11,7 +11,9 @@
     <PackageReference Include="Azure.Storage.Blobs.Batch" Version="12.21.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="8.0.13" />
   </ItemGroup>
-
+	<ItemGroup>
+		<InternalsVisibleTo Include="ThreadLike.Chat.IntegrationTest" />
+	</ItemGroup>
 
 
   <ItemGroup>

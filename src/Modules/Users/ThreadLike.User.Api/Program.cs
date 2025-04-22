@@ -20,6 +20,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddAndConfigureLogging(builder.Configuration);
 
+builder.AddConfigureOpenTelemetry();
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(opt =>

@@ -16,19 +16,20 @@ using ThreadLike.Common.Domain.Shares;
 using Newtonsoft.Json.Serialization;
 using System.Text.Json;
 using ThreadLike.Common.Api;
+using OpenTelemetry.Logs;
+using System.Threading.RateLimiting;
 internal class Program
 {
 	private static void Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
-		// Add services to the container.
-		builder.Services.AddSerilog((services, config) =>
-		{
-			config.ReadFrom.Configuration(builder.Configuration);
-		}, false, false);
+		// Add LOGGING
+		builder.Services.AddLoggingConfig(builder.Configuration);
+
+		builder.AddConfigureOpenTelemetry();
 		
-		if(builder.Environment.IsDevelopment())
+		if (builder.Environment.IsDevelopment())
 		{
 			builder.Configuration.AddJsonFile("appsettings.Secret.Json");
 		}
@@ -115,7 +116,7 @@ internal class Program
 			options.SerializerOptions.PropertyNamingPolicy = null;
 		});
 		WebApplication app = builder.Build();
-
+	
 		// Configure the HTTP request pipeline.
 		if (app.Environment.IsDevelopment())
 		{

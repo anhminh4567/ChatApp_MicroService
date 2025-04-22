@@ -1,10 +1,10 @@
 ﻿using Serilog;
 
-namespace ThreadLike.User.Api.Configures
+namespace ThreadLike.Chat.Api
 {
-	public static class ConfigureLogging
+	public static class AddLoggingConfiguration
 	{
-		public static IServiceCollection AddAndConfigureLogging(this IServiceCollection services, IConfiguration configuration)
+		public static IServiceCollection AddLoggingConfig(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.AddSerilog((services, config) =>
 			{
@@ -18,10 +18,9 @@ namespace ThreadLike.User.Api.Configures
 					x.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
 					x.Endpoint = endpoint;
 					x.Headers = new Dictionary<string, string>
-					{
-						{ "X-Seq-ApiKey", "9UgbPK8d9J3SOiYGHgyx" }
-					};
-
+				{
+					{ "X-Seq-ApiKey", "9UgbPK8d9J3SOiYGHgyx" }
+				};
 				});
 			}, false, false);
 			return services;

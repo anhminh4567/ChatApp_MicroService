@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 using System.Reflection;
 using ThreadLike.Chat.Application;
 using ThreadLike.Chat.Application.Abstracts;
@@ -104,6 +105,7 @@ namespace ThreadLike.Chat.Infrastructure
 						MaxRetries = 2,
 						Mode = Azure.Core.RetryMode.Fixed,
 						Delay = TimeSpan.FromSeconds(5),
+						
 					}
 				});
 
@@ -116,10 +118,13 @@ namespace ThreadLike.Chat.Infrastructure
 			string? redisConnectionString = configuration.GetConnectionString("Cache");
 			ArgumentNullException.ThrowIfNull(redisConnectionString, "Redis connection string is required for real-time communication");
 			services.AddSignalR()
-				.AddJsonProtocol()
+				.AddJsonProtocol((opt) =>
+				{
+					opt.PayloadSerializerOptions.PropertyNamingPolicy = null;
+				})
 				.AddStackExchangeRedis(redisConnectionString, options =>
 				{
-					options.Configuration.ChannelPrefix = "signalr";
+					options.Configuration.ChannelPrefix = RedisChannel.Pattern("signalr");
 					options.Configuration.DefaultDatabase = 1;
 				});
 		}

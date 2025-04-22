@@ -11,7 +11,13 @@ namespace ThreadLike.Chat.Application.Messages.Dtos
 			RuleFor(x => x.FileStream).NotNull();
 		}
 	}
-	public record MessageAttachmentDto(string FileName, string ContentType, Stream FileStream);
+	public record MessageAttachmentDto(string FileName, string ContentType, Stream FileStream) : IDisposable
+	{
+		public void Dispose()
+		{
+			FileStream.Dispose();
+		}
+	}
 	public record MessageReactionDto(  string MesssageId , string ReactionId, string ReactorId);
 
 }
