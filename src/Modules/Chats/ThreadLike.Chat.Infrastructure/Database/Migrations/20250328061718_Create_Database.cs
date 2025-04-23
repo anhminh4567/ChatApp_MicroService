@@ -265,7 +265,7 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserGroupRoles",
+                name: "Participants",
                 schema: "chat",
                 columns: table => new
                 {
@@ -407,13 +407,13 @@ namespace ThreadLike.Chat.Infrastructure.Database.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_UserGroupRoles_GroupId",
                 schema: "chat",
-                table: "UserGroupRoles",
+                table: "Participants",
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserGroupRoles_RoleName",
                 schema: "chat",
-                table: "UserGroupRoles",
+                table: "Participants",
                 column: "RoleName");
 
             migrationBuilder.CreateIndex(

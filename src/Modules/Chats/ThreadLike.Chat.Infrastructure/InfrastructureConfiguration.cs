@@ -1,12 +1,16 @@
 ﻿using Azure.Storage.Blobs;
 using MassTransit;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp;
 using StackExchange.Redis;
 using System.Reflection;
 using ThreadLike.Chat.Application;
@@ -37,7 +41,7 @@ namespace ThreadLike.Chat.Infrastructure
 	{
 		private static readonly Assembly _assembly = typeof(InfrastructureConfiguration).Assembly;
 		private static readonly Assembly _applicationAssembly = typeof(ApplicationConfiguration).Assembly;
-		public static IServiceCollection AddChatInfrastructure(this IServiceCollection services, IConfiguration configuration)
+		public static IServiceCollection AddChatInfrastructure(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
 		{
 			services.AddDbContext<ChatDbContext>((sp, options) =>
 			{
@@ -70,7 +74,7 @@ namespace ThreadLike.Chat.Infrastructure
 
 			services.AddConfigureOptions(configuration);
 
-			services.AddRealTimeCommunication(configuration);
+			services.AddRealTimeCommunication(configuration,environment);
 
 			services.AddBlobFileStorage(configuration);
 
@@ -113,20 +117,68 @@ namespace ThreadLike.Chat.Infrastructure
 			});
 			services.AddScoped<IFilesStorageService, AzureBlobFileStorageService>();
 		}
-		private static void AddRealTimeCommunication(this IServiceCollection services,IConfiguration configuration)
+		private static void AddRealTimeCommunication(this IServiceCollection services,IConfiguration configuration, IWebHostEnvironment environment)
 		{
 			string? redisConnectionString = configuration.GetConnectionString("Cache");
 			ArgumentNullException.ThrowIfNull(redisConnectionString, "Redis connection string is required for real-time communication");
-			services.AddSignalR()
+			Microsoft.AspNetCore.SignalR.ISignalRServerBuilder signalRConfiguration =
+				services.AddSignalR()
 				.AddJsonProtocol((opt) =>
 				{
 					opt.PayloadSerializerOptions.PropertyNamingPolicy = null;
-				})
-				.AddStackExchangeRedis(redisConnectionString, options =>
+				});
+
+			if (environment.IsDevelopment())
+			{
+				signalRConfiguration.AddStackExchangeRedis(redisConnectionString, options =>
 				{
 					options.Configuration.ChannelPrefix = RedisChannel.Pattern("signalr");
 					options.Configuration.DefaultDatabase = 1;
 				});
+				//string? connectionString = configuration.GetConnectionString("BackPlane");
+
+				//using (SqlConnection connection = new SqlConnection(connectionString))
+				//{
+				//	try
+				//	{
+				//		connection.Open();
+				//	}
+				//	catch (SqlException ex)
+				//	{
+				//		// Log the exception details for troubleshooting
+				//		Console.WriteLine($"Error connecting to SQL Server: {ex.Message}");
+				//	}
+				//}
+				////to see how they handle shit
+				//signalRConfiguration.AddSqlServer(o =>
+				//{
+				//	ArgumentException.ThrowIfNullOrWhiteSpace(connectionString, "Database connection string is required for SQL Server backplane");
+
+				//	o.ConnectionString = connectionString;
+				//	// See above - attempts to enable Service Broker on the database at startup
+				//	// if not already enabled. Default false, as this can hang if the database has other sessions.
+				//	o.AutoEnableServiceBroker = true;
+				//	// Every hub has its own message table(s). 
+				//	// This determines the part of the table named that is derived from the hub name.
+				//	// IF THIS IS NOT UNIQUE AMONG ALL HUBS, YOUR HUBS WILL COLLIDE AND MESSAGES MIX.
+				//	o.TableSlugGenerator = hubType => hubType.Name;
+				//	// The number of tables per Hub to use. Adding a few extra could increase throughput
+				//	// by reducing table contention, but all servers must agree on the number of tables used.
+				//	// If you find that you need to increase this, it is probably a hint that you need to switch to Redis.
+				//	o.TableCount = 2;
+				//	// The SQL Server schema to use for the backing tables for this backplane.
+				//	o.SchemaName = "SignalRCore";
+				//});
+			}
+			else
+			{
+				signalRConfiguration.AddStackExchangeRedis(redisConnectionString, options =>
+				{
+					options.Configuration.ChannelPrefix = RedisChannel.Pattern("signalr");
+					options.Configuration.DefaultDatabase = 1;
+				});
+			}
+
 		}
 		private static void AddInboxOutbox(this IServiceCollection services, IConfiguration configuration)
 		{

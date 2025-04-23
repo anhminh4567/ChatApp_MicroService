@@ -12,6 +12,7 @@ namespace ThreadLike.Chat.Application.Abstracts
     {
 		Task Joined(Guid groupId, User joinedUser);
 		Task SendGroupMessage(Guid groupId, List<Message> newMessages);
+		Task SendNewGroupMessage(Guid groupId, Message newMessage);
 		Task SendIsTyping(Guid groupId, string typerId);
 		Task SendStopTyping(Guid groupId, string typerId);
 	}

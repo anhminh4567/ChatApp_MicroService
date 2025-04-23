@@ -31,6 +31,11 @@ namespace ThreadLike.Chat.Infrastructure.Services
 			return hubContext.Clients.Group(groupId.ToString()).ReceiveIsTyping(groupId, typerId);
 		}
 
+		public Task SendNewGroupMessage(Guid groupId, Message newMessage)
+		{
+			return hubContext.Clients.Group(groupId.ToString()).ReceiveNewGroupMessage(groupId, newMessage);
+		}
+
 		public Task SendStopTyping(Guid groupId, string typerId)
 		{
 			return hubContext.Clients.Group(groupId.ToString()).ReceiveStopTyping(groupId, typerId);

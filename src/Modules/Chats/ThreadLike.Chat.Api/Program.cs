@@ -23,7 +23,6 @@ internal class Program
 	private static void Main(string[] args)
 	{
 		var builder = WebApplication.CreateBuilder(args);
-
 		// Add LOGGING
 		builder.Services.AddLoggingConfig(builder.Configuration);
 
@@ -94,7 +93,7 @@ internal class Program
 				.Endpoint(cfg => cfg.InstanceId = identity);
 
 			}]);
-		builder.Services.AddChatInfrastructure(builder.Configuration);
+		builder.Services.AddChatInfrastructure(builder.Configuration,builder.Environment);
 
 		//builder.Services.AddCors(setup =>
 		//{
@@ -148,6 +147,8 @@ internal class Program
 		app.MapControllers();
 		
 		app.MapHub<GroupChatHub>($"{JwtBearerConfigurationForSignalR.HubStartSegment}/group-chat");
+
+		app.MapPrometheusScrapingEndpoint();
 
 		app.Run();
 	}

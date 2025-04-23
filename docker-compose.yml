@@ -20,6 +20,7 @@ services:
     ports:
       - 5671:5672
       - 15671:15672  
+      - 5553:5552
   threadlike.seq: # handle logs
     image: datalust/seq:latest
     container_name: threadlike.seq
@@ -51,6 +52,15 @@ services:
       - MEMORY_MAX_TRACES=50000 # Limit the number of traces stored in memory
       - MEMORY_RETENTION=1h 
 
+  threadlike.grafana:
+    image: grafana/grafana-oss:latest
+    container_name: threadlike.grafana
+    ports:
+      - 3005:3000
+    volumes:
+      - ./.containers/grafana:/var/lib/grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
 
   threadlike.user.api:
     image: ${DOCKER_REGISTRY-}threadlikeuserapi

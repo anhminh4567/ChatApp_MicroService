@@ -123,6 +123,8 @@ RouteGroupBuilder apiGroup = app.MapGroup("api")
 apiGroup.MapUserEndpoints();
 apiGroup.MapRoleEndpoints();
 
+app.MapPrometheusScrapingEndpoint();
+
 app.Run();
 
 

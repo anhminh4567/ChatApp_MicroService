@@ -86,6 +86,7 @@ namespace ThreadLike.Chat.Application.Messages.Commands.AddManyToGroup
 			}
 			await unitOfWork.SaveChangesAsync(cancellationToken);
 			await groupChatService.SendGroupMessage(group.Id, response);
+			await groupChatService.SendNewGroupMessage(group.Id, response.First());
 			return response;
 		}
 	}

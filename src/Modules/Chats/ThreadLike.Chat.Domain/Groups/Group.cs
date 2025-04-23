@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ThreadLike.Chat.Domain.GroupRoles;
 using ThreadLike.Chat.Domain.Groups.Entities;
 using ThreadLike.Chat.Domain.Groups.Enums;
+using ThreadLike.Chat.Domain.Groups.Options;
 using ThreadLike.Chat.Domain.Messages;
 using ThreadLike.Chat.Domain.Shared;
 using ThreadLike.Chat.Domain.Users;
@@ -24,6 +25,7 @@ namespace ThreadLike.Chat.Domain.Groups
 		public DateTime? DeleteAt { get; private set; }
 		public GroupType GroupType { get; private set; }
 		public MediaObject? ThumbDetail { get; private set; }
+		public LastMessages? LastMessage { get; private set; } 
 		public List<Message> Messages { get; private set; } = new();
 		public List<Participant> Participants { get; private set; } = new();
 
@@ -75,7 +77,8 @@ namespace ThreadLike.Chat.Domain.Groups
 				default:
 					throw new Exception("group typ unfit");
 			}
-
+			GroupOptions groupOptions = new GroupOptions();
+			group.LastMessage = LastMessages.CreateNewGroupMessage(groupOptions.DefaultNewGroupMessageContent,groupOptions.LastMessageOption);
 			return group;
 		}
 		public Result AddToGroup(User user, GroupRole roleType)
@@ -84,6 +87,10 @@ namespace ThreadLike.Chat.Domain.Groups
 				return Result.Failure("user already in group");
 
 			Participants.Add(Entities.Participant.Create(user.Id, Id, roleType.Role));
+			GroupOptions groupOptions = new GroupOptions();
+
+			this.LastMessage = LastMessages.CreateMemberMessage(groupOptions.DefaultNewMemberMessageContent, groupOptions.LastMessageOption);
+
 			return Result.Ok();
 		}
 		public Result RemoveFromGroup(User user)

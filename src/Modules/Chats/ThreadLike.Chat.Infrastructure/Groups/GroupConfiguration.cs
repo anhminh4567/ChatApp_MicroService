@@ -32,7 +32,7 @@ namespace ThreadLike.Chat.Infrastructure.Groups
 				.OnDelete(DeleteBehavior.NoAction);
 
 			builder.OwnsOne(x => x.ThumbDetail, build => build.ToJson());
-
+			builder.OwnsOne(x => x.LastMessage, build => build.ToJson());
 		}
 	}
 }

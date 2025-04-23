@@ -13,6 +13,7 @@ namespace ThreadLike.Chat.Infrastructure.Hubs
     {
 		Task Joined(Guid groupId, User joinedUser);
 		Task ReceiveGroupMessage(Guid groupId, List<Message> newMessages);
+		Task ReceiveNewGroupMessage(Guid groupId, Message newMessage);
 		Task ReceiveIsTyping(Guid groupId, string typerId);
 		Task ReceiveStopTyping(Guid groupId, string typerId);
 		Task ReceiveError(int code, string errorMessage);
