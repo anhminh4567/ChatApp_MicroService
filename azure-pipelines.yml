@@ -50,6 +50,7 @@ stages:
   
 - stage: Build_And_Publish_artifact
   displayName: Build and push stage
+  dependsOn: []
   jobs:
   # - job: buildandpush
   #   displayName: build and push 
@@ -67,8 +68,8 @@ stages:
     displayName: Build module Chat
     steps:
     - script: |
-       pwd
        docker --version
+       docker ps
        cd "$(Build.SourcesDirectory)"
        pwd
        docker build -f "$(dockerfileChatModule)" -t ChatImage:$(image_tag) .
