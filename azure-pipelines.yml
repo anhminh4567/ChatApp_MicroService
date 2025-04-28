@@ -39,39 +39,43 @@ stages:
   isSkippable: true
   condition: eq(variables['will_run_test'],'true')
   jobs:
-    - job: 
-      displayName: run test on chat module 
-      steps: 
-        - script: dotnet test $(solutionPath)
+  - job: 
+    displayName: run test on chat module 
+    steps: 
+    - script: | 
+       dotnet test $(solutionPath)
+       whoami
   
 - stage: Build_And_Publish_artifact
-  displayName: Build_and_push_stage
+  displayName: Build and push stage
   jobs:
-  - job: buildandpush
-    displayName: build and push 
+  # - job: buildandpush
+  #   displayName: build and push 
+  #   steps:
+    # - task: Docker@2
+    #   inputs:
+    #     containerRegistry:   $(dockerRegistryServiceConnection)
+    #     repository: $(imageRepository)
+    #     buildContext: $(Build.SourcesDirectory)
+    #     command: 'buildAndPush'
+    #     Dockerfile: '$(dockerfileChatModule)'
+    #     addPipelineData: false
+    #     addBaseImageData: false
+  - job: BuildModuleChat
+    displayName: Build module Chat
     steps:
+    - script: |
+       docker --version
+       cd "$(Build.SourcesDirectory)"
+       docker build -f "$(dockerfileChatModule)" -t ChatImage:$(image_tag) .
     - task: Docker@2
       inputs:
         containerRegistry:   $(dockerRegistryServiceConnection)
+        Dockerfile: $(dockerfileUserModule)
         repository: $(imageRepository)
-        buildContext: $(Build.SourcesDirectory)
-        command: 'buildAndPush'
-        Dockerfile: '$(dockerfileChatModule)'
+        command: 'push'
         addPipelineData: false
         addBaseImageData: false
-  # - job: BuildModuleChat
-  #   displayName: Build module Chat
-  #   steps:
-  #   - script:
-  #      docker build -f "$(dockerfileChatModule)" -t ChatImage:$(image_tag) .
-  #   - task: Docker@2
-  #     inputs:
-  #       containerRegistry:   $(dockerRegistryServiceConnection)
-  #       Dockerfile: $(dockerfileUserModule)
-  #       repository: $(imageRepository)
-  #       command: 'push'
-  #       addPipelineData: false
-  #       addBaseImageData: false
     
 
   # - job: BuildModuleUser
