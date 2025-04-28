@@ -18,7 +18,7 @@ parameters:
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '943ee1ee-a89f-4cff-8cfb-376003031087'
-  imageRepository: 'chatappmicroservice'
+  imageRepository: 'chatimage'
   containerRegistry: 'chatappcr.azurecr.io'
   #dockeer file path
   solutionPath : '$(Build.SourcesDirectory)\ThreadLikeAppWithRealTime.sln'
@@ -52,18 +52,6 @@ stages:
   displayName: Build and push stage
   dependsOn: []
   jobs:
-  # - job: buildandpush
-  #   displayName: build and push 
-  #   steps:
-    # - task: Docker@2
-    #   inputs:
-    #     containerRegistry:   $(dockerRegistryServiceConnection)
-    #     repository: $(imageRepository)
-    #     buildContext: $(Build.SourcesDirectory)
-    #     command: 'buildAndPush'
-    #     Dockerfile: '$(dockerfileChatModule)'
-    #     addPipelineData: false
-    #     addBaseImageData: false
   - job: BuildModuleChat
     displayName: Build module Chat
     steps:
@@ -72,12 +60,13 @@ stages:
        docker ps
        cd "$(Build.SourcesDirectory)"
        pwd
-       docker build -f "$(dockerfileChatModule)" -t chatimage:$(image_tag) .
+       docker build -f "$(dockerfileChatModule)" -t $(imageRepository):$(image_tag) .
     - task: Docker@2
       inputs:
         containerRegistry:   $(dockerRegistryServiceConnection)
         Dockerfile: $(dockerfileUserModule)
         repository: $(imageRepository)
+        tags: $(image_tag)
         command: 'push'
         addPipelineData: false
         addBaseImageData: false
