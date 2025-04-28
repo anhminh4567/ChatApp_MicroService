@@ -17,5 +17,6 @@ internal sealed class LogContextTraceLoggingMiddleware : IMiddleware
 		{
 			return next.Invoke(context);
 		}
+		//return next.Invoke(context);
 	}
 }

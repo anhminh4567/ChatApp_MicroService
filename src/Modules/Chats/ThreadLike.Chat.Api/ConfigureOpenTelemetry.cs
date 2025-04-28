@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Diagnostics.Metrics;
 using Npgsql;
+using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using System.Diagnostics;
 
 namespace ThreadLike.Chat.Api
 {
@@ -30,12 +32,19 @@ namespace ThreadLike.Chat.Api
 			})
 			.WithTracing((config) =>
 			{
-				config.AddAspNetCoreInstrumentation();
-				config.AddHttpClientInstrumentation();
-				config.AddEntityFrameworkCoreInstrumentation();
-				config.AddNpgsql();
-				config.AddRedisInstrumentation();
-				config.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+				
+				config.AddAspNetCoreInstrumentation()
+				.AddHttpClientInstrumentation()
+				.AddSqlClientInstrumentation(opt =>
+				{
+					opt.SetDbStatementForText = true;
+				})
+				.AddEntityFrameworkCoreInstrumentation(opt => opt.SetDbStatementForText = true)
+				.AddNpgsql()
+				.AddRedisInstrumentation()
+				.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+				config.AddProcessor(new ExternalServiceProcessor());
+
 				config.AddOtlpExporter(options =>
 				{
 					string? traceExporterEndpoint = builder.Configuration["Otlp:Traces:PushEndpoint"];
@@ -45,7 +54,30 @@ namespace ThreadLike.Chat.Api
 					options.Endpoint = new Uri(traceExporterEndpoint);
 				});
 			});
+
+
+
 			return builder;
+		}
+	}
+
+	public class ExternalServiceProcessor : BaseProcessor<Activity>
+	{
+		public override void OnEnd(Activity activity)
+		{
+			// For PostgreSQL
+			if (activity.Tags.Any(tag => tag.Key == "db.system" && tag.Value == "postgresql"))
+			{
+				activity.SetTag("service.name", "PostgreSQL");
+			}
+
+			// For Redis
+			if (activity.Tags.Any(tag => tag.Key == "db.system" && tag.Value == "redis"))
+			{
+				activity.SetTag("service.name", "Redis");
+			}
+
+			base.OnEnd(activity);
 		}
 	}
 }
