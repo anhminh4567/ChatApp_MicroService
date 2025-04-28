@@ -12,7 +12,7 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Modules/Users/ThreadLike.User.Api/ThreadLike.User.Api.csproj", "ThreadLikeAppWithRealTime/src/Modules/Users/ThreadLike.User.Api/"]
+COPY ["src/Modules/Users/ThreadLike.User.Api/ThreadLike.User.Api.csproj", "src/Modules/Users/ThreadLike.User.Api/"]
 RUN dotnet restore "./src/Modules/Users/ThreadLike.User.Api/ThreadLike.User.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Modules/Users/ThreadLike.User.Api"
