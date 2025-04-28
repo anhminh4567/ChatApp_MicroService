@@ -33,7 +33,7 @@ variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '943ee1ee-a89f-4cff-8cfb-376003031087'
   chatImageName: 'chatimage'
-  userImageName: 'chatimage'
+  userImageName: 'userimage'
 
   containerRegistry: 'chatappcr.azurecr.io'
   #dockeer file path
