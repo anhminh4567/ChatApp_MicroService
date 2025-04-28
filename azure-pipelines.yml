@@ -19,13 +19,13 @@ variables:
   imageRepository: 'chatappmicroservice'
   containerRegistry: 'chatappcr.azurecr.io'
   #dockeer file path
-  solutionPath : '$(Build.SourcesDirectory)/ThreadLikeAppWithRealTime.sln'
+  solutionPath : '$(Build.SourcesDirectory)\ThreadLikeAppWithRealTime.sln'
 
-  chatModulePath: '$(Build.SourcesDirectory)/src/Modules/Chats'
-  userModulePath: '$(Build.SourcesDirectory)/src/Modules/Users'
+  chatModulePath: '$(Build.SourcesDirectory)\src\Modules\Chats'
+  userModulePath: '$(Build.SourcesDirectory)\src\Modules\Users'
 
-  dockerfileChatModule: '$(chatModulePath)/ThreadLike.Chat.Api/Dockerfile'
-  dockerfileUserModule : '$(userModulePath)/ThreadLike.User.Api/Dockerfile'
+  dockerfileChatModule: '$(chatModulePath)\ThreadLike.Chat.Api\Dockerfile'
+  dockerfileUserModule : '$(userModulePath)\ThreadLike.User.Api\Dockerfile'
     
   tag: '$(Build.BuildId)'
   image_tag: latest
@@ -50,7 +50,7 @@ stages:
   - job: BuildModuleChat
     displayName: Build module Chat
     steps:
-    - script: docker build -f $(dockerfileChatModule) -t ChatImage:$(image_tag)
+    - script: docker build -f "$(dockerfileChatModule)"" -t ChatImage:$(image_tag)
     - task: Docker@2
       inputs:
         containerRegistry:   $(dockerRegistryServiceConnection)
