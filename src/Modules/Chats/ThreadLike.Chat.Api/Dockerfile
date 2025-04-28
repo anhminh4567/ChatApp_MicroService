@@ -26,9 +26,11 @@ RUN dotnet publish "./ThreadLike.Chat.Api.csproj" -c $BUILD_CONFIGURATION -o /ap
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
-RUN apt-get update && apt-get install -y tzdata && \
-    ln -fs /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime && \
-    dpkg-reconfigure --frontend noninteractive tzdata
+#USER root
+#RUN apt-get update && apt-get install -y tzdata && \
+    #ln -fs /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime && \
+    #dpkg-reconfigure --frontend noninteractive tzdata
+#USER $APP_UID
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ThreadLike.Chat.Api.dll","-e","WEBSITE_TIME_ZONE=Asia/Ho_Chi_Minh"]
