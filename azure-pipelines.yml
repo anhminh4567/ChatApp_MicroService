@@ -14,11 +14,27 @@ resources:
 parameters:
   - name: runTest
     type: boolean
-    default: true
+    default: false
+  - name: buildPush_ChatModule
+    type: boolean
+    default: false
+  - name: buildPush_UserModule
+    type: boolean
+    default: false
+  - name: environment
+    type: string
+    default: Development
+    values:
+    - Development
+    - Staging
+    - Production
+      
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '943ee1ee-a89f-4cff-8cfb-376003031087'
-  imageRepository: 'chatimage'
+  chatImageName: 'chatimage'
+  userImageName: 'chatimage'
+
   containerRegistry: 'chatappcr.azurecr.io'
   #dockeer file path
   solutionPath : '$(Build.SourcesDirectory)\ThreadLikeAppWithRealTime.sln'
@@ -27,11 +43,9 @@ variables:
   userModulePath: '$(Build.SourcesDirectory)\src\Modules\Users'
 
   dockerfileChatModule: '$(chatModulePath)\ThreadLike.Chat.Api\Dockerfile'
-  dockerfileUserModule : '$(userModulePath)\ThreadLike.User.Api\Dockerfile'
-    
-  tag: '$(Build.BuildId)'
+  dockerfileUserModule : '$(userModulePath)\ThreadLike.User.Api\Dockerfile'    
   image_tag: latest
-
+  image_tag_commit_version: $(Build.SourceVersion)
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
@@ -54,18 +68,28 @@ stages:
   jobs:
   - job: BuildModuleChat
     displayName: Build module Chat
+    condition: eq( ${{ parameters.buildPush_ChatModule }} ,'true') #variables['will_run_test']
     steps:
-    # - script: |
-    #    docker --version
-    #    docker ps
-    #    cd "$(Build.SourcesDirectory)"
-    #    pwd
-    #    docker build -f "$(dockerfileChatModule)" -t $(imageRepository):$(image_tag) .
     - task: Docker@2
       inputs:
         containerRegistry:   $(dockerRegistryServiceConnection)
         Dockerfile: $(dockerfileChatModule)
-        repository: $(imageRepository)
+        repository: $(chatImageName)
+        buildContext: $(Build.SourcesDirectory)
+        tags: $(image_tag)
+        command: buildAndPush
+        addPipelineData: false
+        addBaseImageData: false
+
+  - job: BuildModuleUser
+    displayName: Build module user
+    condition: eq( ${{ parameters.buildPush_UserModule }} ,'true')
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry:   $(dockerRegistryServiceConnection)
+        Dockerfile: $(dockerfileUserModule)
+        repository: $(userImageName)
         buildContext: $(Build.SourcesDirectory)
         tags: $(image_tag)
         command: buildAndPush
