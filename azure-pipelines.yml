@@ -66,6 +66,7 @@ stages:
         containerRegistry:   $(dockerRegistryServiceConnection)
         Dockerfile: $(dockerfileChatModule)
         repository: $(imageRepository)
+        buildContext: $(Build.SourcesDirectory)
         tags: $(image_tag)
         command: buildAndPush
         addPipelineData: false
