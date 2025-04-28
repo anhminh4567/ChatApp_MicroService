@@ -5,35 +5,83 @@
 trigger:
 - none
 
+pool:
+  vmImage: $(vmImageName)
+
 resources:
 - repo: self
 
 variables:
+  will_run_test: true
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '943ee1ee-a89f-4cff-8cfb-376003031087'
   imageRepository: 'anhminhchatappmicroservice'
   containerRegistry: 'chatappcr.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/src/Modules/Chats/ThreadLike.Chat.Api/Dockerfile'
+  #dockeer file path
+  chatModulePath: '$(Build.SourcesDirectory)/src/Modules/Chats'
+  userModulePath: '$(Build.SourcesDirectory)/src/Modules/Users'
+
+  dockerfileChatModule: '$(chatModulePath)/ThreadLike.Chat.Api/Dockerfile'
+  dockerfileUserModule : '$(userModulePath)/ThreadLike.User.Api/Dockerfile'
+    
   tag: '$(Build.BuildId)'
+  image_tag: latest
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
 stages:
-- stage: Build
-  displayName: Build and push stage
+- stage: Test
+  displayName: Test before build
+  isSkippable: true
+  condition: eq(variables['will_run_test'],'true')
   jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
+    - job: 
+      displayName: run test on chat module 
+      steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          #azureSubscription: 'Azure for Students(e32c0512-d924-441c-a0fb-54c822262e67)'
+          command: 'test'
+          projects: $(chatModulePath)
+          testRunTitle: 'runtest'
+          requestTimeout: 60000
+    - job: 
+      displayName: run test on user module 
+      steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          #azureSubscription: 'Azure for Students(e32c0512-d924-441c-a0fb-54c822262e67)'
+          command: 'test'
+          projects: $(userModulePath)
+          testRunTitle: 'runtest'
+          requestTimeout: 60000
+  
+- stage: Build_And_Publish_artifact
+  displayName: Build_and_push_stage
+  jobs:
+  - job: BuildModuleChat
+    displayName: Build module Chat
     steps:
     - task: Docker@2
-      displayName: Build and push an image to container registry
+      displayName: Build and push module Chat to container registry
       inputs:
         command: buildAndPush
         repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
+        dockerfile: $(dockerfileChatModule)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          $(image_tag)
+
+  - job: BuildModuleUser
+    displayName: Build and push Module 2 image
+    steps:
+    - task: Docker@2
+      displayName: Build and push Module user image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfileUserModule)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(image_tag)
