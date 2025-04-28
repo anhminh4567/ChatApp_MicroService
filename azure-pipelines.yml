@@ -55,18 +55,18 @@ stages:
   - job: BuildModuleChat
     displayName: Build module Chat
     steps:
-    - script: |
-       docker --version
-       docker ps
-       cd "$(Build.SourcesDirectory)"
-       pwd
-       docker build -f "$(dockerfileChatModule)" -t $(imageRepository):$(image_tag) .
+    # - script: |
+    #    docker --version
+    #    docker ps
+    #    cd "$(Build.SourcesDirectory)"
+    #    pwd
+    #    docker build -f "$(dockerfileChatModule)" -t $(imageRepository):$(image_tag) .
     - task: Docker@2
       inputs:
         containerRegistry:   $(dockerRegistryServiceConnection)
-        Dockerfile: $(dockerfileUserModule)
+        Dockerfile: $(dockerfileChatModule)
         repository: $(imageRepository)
         tags: $(image_tag)
-        command: 'push'
+        command: buildAndPush
         addPipelineData: false
         addBaseImageData: false
