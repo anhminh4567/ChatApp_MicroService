@@ -12,16 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["ThreadLikeAppWithRealTime/src/Modules/Users/ThreadLike.User.Api/ThreadLike.User.Api.csproj", "ThreadLikeAppWithRealTime/src/Modules/Users/ThreadLike.User.Api/"]
-RUN dotnet restore "./ThreadLikeAppWithRealTime/src/Modules/Users/ThreadLike.User.Api/ThreadLike.User.Api.csproj"
+COPY ["src/Modules/Users/ThreadLike.User.Api/ThreadLike.User.Api.csproj", "src/Modules/Users/ThreadLike.User.Api/"]
+RUN dotnet restore "./src/Modules/Users/ThreadLike.User.Api/ThreadLike.User.Api.csproj"
 COPY . .
-WORKDIR "/src/ThreadLikeAppWithRealTime/src/Modules/Users/ThreadLike.User.Api"
+WORKDIR "/src/src/Modules/Users/ThreadLike.User.Api"
 RUN dotnet build "./ThreadLike.User.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./ThreadLike.User.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN apt-get update && apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime && \
+    dpkg-reconfigure --frontend noninteractive tzdata
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final

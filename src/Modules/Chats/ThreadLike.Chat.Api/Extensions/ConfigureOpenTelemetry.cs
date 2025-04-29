@@ -5,8 +5,9 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
+using ThreadLike.Common.Infrastructure.OpenTelemetryExtend;
 
-namespace ThreadLike.Chat.Api
+namespace ThreadLike.Chat.Api.Extensions
 {
 	public static class ConfigureOpenTelemetry
 	{
@@ -33,7 +34,10 @@ namespace ThreadLike.Chat.Api
 			.WithTracing((config) =>
 			{
 				
-				config.AddAspNetCoreInstrumentation()
+				config.AddAspNetCoreInstrumentation(opt =>
+				{
+					opt.Filter = (context) => !context.Request.Path.StartsWithSegments("/metrics");
+				})
 				.AddHttpClientInstrumentation()
 				.AddSqlClientInstrumentation(opt =>
 				{
@@ -61,23 +65,5 @@ namespace ThreadLike.Chat.Api
 		}
 	}
 
-	public class ExternalServiceProcessor : BaseProcessor<Activity>
-	{
-		public override void OnEnd(Activity activity)
-		{
-			// For PostgreSQL
-			if (activity.Tags.Any(tag => tag.Key == "db.system" && tag.Value == "postgresql"))
-			{
-				activity.SetTag("service.name", "PostgreSQL");
-			}
-
-			// For Redis
-			if (activity.Tags.Any(tag => tag.Key == "db.system" && tag.Value == "redis"))
-			{
-				activity.SetTag("service.name", "Redis");
-			}
-
-			base.OnEnd(activity);
-		}
-	}
+	
 }

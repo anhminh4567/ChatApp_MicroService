@@ -5,35 +5,93 @@
 trigger:
 - none
 
+pool:
+  name: Default
+  # vmImage: 'ubuntu-latest'
+
 resources:
 - repo: self
-
+parameters:
+  - name: runTest
+    type: boolean
+    default: false
+  - name: buildPush_ChatModule
+    type: boolean
+    default: false
+  - name: buildPush_UserModule
+    type: boolean
+    default: false
+  - name: environment
+    type: string
+    default: Development
+    values:
+    - Development
+    - Staging
+    - Production
+      
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '943ee1ee-a89f-4cff-8cfb-376003031087'
-  imageRepository: 'anhminhchatappmicroservice'
-  containerRegistry: 'chatappcr.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/src/Modules/Chats/ThreadLike.Chat.Api/Dockerfile'
-  tag: '$(Build.BuildId)'
+  chatImageName: 'chatimage'
+  userImageName: 'userimage'
 
+  containerRegistry: 'chatappcr.azurecr.io'
+  #dockeer file path
+  solutionPath : '$(Build.SourcesDirectory)\ThreadLikeAppWithRealTime.sln'
+
+  chatModulePath: '$(Build.SourcesDirectory)\src\Modules\Chats'
+  userModulePath: '$(Build.SourcesDirectory)\src\Modules\Users'
+
+  dockerfileChatModule: '$(chatModulePath)\ThreadLike.Chat.Api\Dockerfile'
+  dockerfileUserModule : '$(userModulePath)\ThreadLike.User.Api\Dockerfile'    
+  image_tag: latest
+  image_tag_commit_version: $(Build.SourceVersion)
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
 stages:
-- stage: Build
-  displayName: Build and push stage
+- stage: Test
+  displayName: Test before build
+  isSkippable: true
+  condition: eq( ${{ parameters.runTest }} ,'true') #variables['will_run_test']
   jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
+  - job: 
+    displayName: run test on chat module 
+    steps: 
+    - script: | 
+       dotnet test $(solutionPath)
+       whoami
+  
+- stage: Build_And_Publish_artifact
+  displayName: Build and push stage
+  dependsOn: []
+  jobs:
+  - job: BuildModuleChat
+    displayName: Build module Chat
+    condition: eq( ${{ parameters.buildPush_ChatModule }} ,'true') #variables['will_run_test']
     steps:
     - task: Docker@2
-      displayName: Build and push an image to container registry
       inputs:
+        containerRegistry:   $(dockerRegistryServiceConnection)
+        Dockerfile: $(dockerfileChatModule)
+        repository: $(chatImageName)
+        buildContext: $(Build.SourcesDirectory)
+        tags: $(image_tag)
         command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+        addPipelineData: false
+        addBaseImageData: false
+
+  - job: BuildModuleUser
+    displayName: Build module user
+    condition: eq( ${{ parameters.buildPush_UserModule }} ,'true')
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry:   $(dockerRegistryServiceConnection)
+        Dockerfile: $(dockerfileUserModule)
+        repository: $(userImageName)
+        buildContext: $(Build.SourcesDirectory)
+        tags: $(image_tag)
+        command: buildAndPush
+        addPipelineData: false
+        addBaseImageData: false

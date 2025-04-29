@@ -68,6 +68,8 @@ services:
     build:
       context: .
       dockerfile: src/Modules/Users/ThreadLike.User.Api/Dockerfile
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
     volumes:
         - ./.data/Logfiles/Users/:/app/Logfiles/Users/
     depends_on:
@@ -75,7 +77,7 @@ services:
       - threadlike.redis
     ports:
       - 8200:8080
-      - 8201:8081
+      # - 8201:8081
 
   threadlike.chat.api:
     image: ${DOCKER_REGISTRY-}threadlikechatapi
@@ -83,6 +85,8 @@ services:
     build:
       context: .
       dockerfile: src/Modules/Chats/ThreadLike.Chat.Api/Dockerfile
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
     volumes:
         - ./.data/Logfiles/Chats/:/app/Logfiles/Chats/
     depends_on:
@@ -90,5 +94,5 @@ services:
       - threadlike.redis
     ports:
       - 8202:8080
-      - 8203:8081
+      # - 8203:8081
 

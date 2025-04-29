@@ -9,6 +9,7 @@ using ThreadLike.User.Api;
 using ThreadLike.User.Api.Configures;
 using ThreadLike.User.Api.Consumers;
 using ThreadLike.User.Api.Endpoints;
+using ThreadLike.User.Api.Extensions;
 using ThreadLike.User.Api.Middlewares;
 using ThreadLike.User.Application;
 using ThreadLike.User.Infrastructure;
@@ -17,6 +18,10 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+if (builder.Environment.IsProduction())
+	builder.ConfigureProductionSecret();
+
 
 builder.Services.AddAndConfigureLogging(builder.Configuration);
 
@@ -70,7 +75,7 @@ builder.Services.AddUserApplication();
 // Add infra
 builder.Services.AddApiModule(builder.Configuration);
 
-builder.Services.AddInfrastructure(builder.Configuration, rabbitMqSettings, UserModuleMetaData.ServiceName,
+builder.Services.AddInfrastructure(builder.Environment,builder.Configuration, rabbitMqSettings, UserModuleMetaData.ServiceName,
 	[(config, instanceId) => 
 	{ 
 		config.AddConsumer<GetUserRolesRequestConsummer>().Endpoint(e => e.InstanceId = instanceId ); 
@@ -89,11 +94,11 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-	app.UseSwagger();
-	app.UseSwaggerUI();
 	app.UseDeveloperExceptionPage();
 }
 // use static file have alot of noise so it should not be logged, and placed beefore useSeriologRequestLogging
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors(CorsPolicy.AllowClientSPA);
 

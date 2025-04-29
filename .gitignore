@@ -407,3 +407,5 @@ LogFile*
 
 # Ignore appsettings.secret.json
 appsettings.Secret.json
+# Ignore docker compose , this is where secret we set for local developmeent
+docker-compose.override.yml

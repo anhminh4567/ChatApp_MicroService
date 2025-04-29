@@ -29,10 +29,10 @@ internal class Program
 		builder.AddConfigureOpenTelemetry();
 		
 		if (builder.Environment.IsDevelopment())
-		{
 			builder.Configuration.AddJsonFile("appsettings.Secret.Json");
-		}
 
+		if (builder.Environment.IsProduction())
+			builder.ConfigureProductionSecret();
 
 		// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
@@ -84,7 +84,7 @@ internal class Program
 		builder.Services.AddApplication([typeof(ThreadLike.Chat.Application.ApplicationConfiguration).Assembly]);
 		builder.Services.AddChatApplication();
 		// Add infra
-		builder.Services.AddInfrastructure(builder.Configuration, rabbitMqSettings, ChatModuleMetaData.ServiceName, [
+		builder.Services.AddInfrastructure(builder.Environment,builder.Configuration, rabbitMqSettings, ChatModuleMetaData.ServiceName, [
 			(config, identity) => {
 				config.AddConsumer<UserCreatedIntegrationEventConsumer>((ctx ,cfig) => {
 					cfig.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(25)));
@@ -95,16 +95,6 @@ internal class Program
 			}]);
 		builder.Services.AddChatInfrastructure(builder.Configuration,builder.Environment);
 
-		//builder.Services.AddCors(setup =>
-		//{
-		//	setup.AddPolicy("AllowClient", policy =>
-		//	{
-		//		policy.WithOrigins("http://localhost:3100")
-		//			.AllowAnyHeader()
-		//			.AllowAnyMethod()
-		//			.AllowCredentials();
-		//	});
-		//});
 		// some service configure for api layer, lilke CORS ( in future, shared middleware )
 		builder.Services.AddApiModule(builder.Configuration);
 
@@ -119,11 +109,12 @@ internal class Program
 		// Configure the HTTP request pipeline.
 		if (app.Environment.IsDevelopment())
 		{
-			app.UseSwagger();
-			app.UseSwaggerUI();
 			app.UseDeveloperExceptionPage();
 			app.SeedIcons();
 		}
+		app.UseSwagger();
+		app.UseSwaggerUI();
+
 		app.UseCors(CorsPolicy.AllowClientSPA);
 
 		app.UseMiddleware<LogContextTraceLoggingMiddleware>();
