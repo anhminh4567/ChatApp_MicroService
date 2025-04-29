@@ -1,9 +1,11 @@
 ﻿using Npgsql;
+using Npgsql.PostgresTypes;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using ThreadLike.Common.Infrastructure.OpenTelemetryExtend;
 
-namespace ThreadLike.User.Api
+namespace ThreadLike.User.Api.Extensions
 {
 	public static class ConfigureOpenTelemetry
 	{
@@ -29,15 +31,23 @@ namespace ThreadLike.User.Api
 				})
 				.WithTracing((config) =>
 				{
-					config.AddAspNetCoreInstrumentation();
+					config.AddAspNetCoreInstrumentation(opt =>
+					{
+						opt.Filter = (context) => !context.Request.Path.StartsWithSegments("/metrics");
+					});
 					config.AddHttpClientInstrumentation();
-					config.AddEntityFrameworkCoreInstrumentation();
+					config.AddEntityFrameworkCoreInstrumentation(opt =>
+					{
+						opt.SetDbStatementForText = true;
+					});
 					config.AddNpgsql();
 					config.AddRedisInstrumentation(opt =>
 					{
 						opt.EnrichActivityWithTimingEvents = true;
 					});
 					config.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+					config.AddProcessor(new ExternalServiceProcessor());
+
 					config.AddOtlpExporter(options =>
 					{
 						string? traceExporterEndpoint = builder.Configuration["Otlp:Traces:PushEndpoint"];

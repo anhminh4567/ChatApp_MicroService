@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace ThreadLike.Chat.Api
+namespace ThreadLike.Chat.Api.Extensions
 {
 	public static class AddLoggingConfiguration
 	{

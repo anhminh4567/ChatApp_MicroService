@@ -1,7 +1,10 @@
 ﻿using MassTransit;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Quartz;
 using StackExchange.Redis;
@@ -22,6 +25,7 @@ namespace ThreadLike.Common.Infrastructure;
 public static class InfrastructureConfiguration
 {
 	public static IServiceCollection AddInfrastructure(this IServiceCollection services,
+		IWebHostEnvironment environment,
 		IConfiguration configuration,
 		RabbitMqSettings rabbitMqSettings,
 		string serviceName,
@@ -80,16 +84,31 @@ public static class InfrastructureConfiguration
 			}
 
 			config.SetKebabCaseEndpointNameFormatter();
-
-			config.UsingRabbitMq((ctx, cfg) =>
+			if (environment.IsDevelopment())
 			{
-				cfg.Host(new Uri(rabbitMqSettings.Host), config =>
+				config.UsingRabbitMq((ctx, cfg) =>
 				{
-					config.Username(rabbitMqSettings.Username);
-					config.Password(rabbitMqSettings.Password);
+					cfg.Host(new Uri(rabbitMqSettings.Host), config =>
+					{
+						config.Username(rabbitMqSettings.Username);
+						config.Password(rabbitMqSettings.Password);
+					});
+					cfg.ConfigureEndpoints(ctx);
 				});
-				cfg.ConfigureEndpoints(ctx);
-			});
+			}
+			else if(environment.IsProduction())
+			{
+				string? azureServiceBusConnectionString = configuration.GetConnectionString("Queue");
+				ArgumentException.ThrowIfNullOrEmpty(azureServiceBusConnectionString);
+				config.UsingAzureServiceBus((ctx, cfg) =>
+				{
+					cfg.Host(azureServiceBusConnectionString,config =>
+					{
+						config.TransportType = Azure.Messaging.ServiceBus.ServiceBusTransportType.AmqpWebSockets;
+					});
+					cfg.ConfigureEndpoints(ctx);
+				});
+			}
 		});
 		//------------------------------- Event buss section -------------------------------
 
@@ -107,33 +126,6 @@ public static class InfrastructureConfiguration
 			options.WaitForJobsToComplete = true;
 		});
 		//------------------------------- QUARTZ for BG Job -------------------------------//
-
-
-
-
-		//------------------------------- OpenTelemetry SERVICE -------------------------------//
-		//services
-		//	.AddOpenTelemetry()
-		//	.ConfigureResource(resource => resource.AddService(serviceName))
-		//	.WithTracing(tracing =>
-		//	{
-		//		tracing
-		//			.AddAspNetCoreInstrumentation(config =>
-		//			{
-
-		//			})
-		//			.AddHttpClientInstrumentation()
-		//			.AddEntityFrameworkCoreInstrumentation()
-		//			.AddRedisInstrumentation(connectionMultiplexer)
-		//			.AddNpgsql(option =>
-		//			{
-		//				//option.EnableConnectionLevelAttributes = true;
-		//				//option.EnableStatementLevelAttributes = true;
-		//			})
-		//			.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
-
-		//		tracing.AddOtlpExporter();
-		//	});
 
 		// Enable detailed logging for OpenTelemetry and Redis
 		return services;

@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using Dapper;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quartz;
 using ThreadLike.Chat.Application;
+using ThreadLike.Chat.Infrastructure.Outbox;
 using ThreadLike.Common.Application.Data;
 using ThreadLike.Common.Application.EventBus;
 using ThreadLike.Common.Contracts.Abstracts;
@@ -26,6 +28,11 @@ internal sealed class ProcessInboxJob(
 
 	public async Task Execute(IJobExecutionContext context)
 	{
+		using var activity = new Activity(ModuleName + "." + InboxOptions.SectionName);
+		activity.Start();
+		activity.AddTag("module", ModuleName);
+		activity.AddTag("batchSize", inboxOptions.Value.BatchSize.ToString());
+
 		logger.LogInformation("{Module} - Beginning to process inbox messages", ModuleName);
 
 		using DbConnection connection = await dbConnectionFactory.OpenConnectionAsync();
@@ -75,6 +82,8 @@ internal sealed class ProcessInboxJob(
 		await transaction.CommitAsync();
 
 		logger.LogInformation("{Module} - Completed processing inbox messages", ModuleName);
+
+		activity.Stop();
 	}
 
 	private async Task<IReadOnlyList<InboxMessageResponse>> GetInboxMessagesAsync(

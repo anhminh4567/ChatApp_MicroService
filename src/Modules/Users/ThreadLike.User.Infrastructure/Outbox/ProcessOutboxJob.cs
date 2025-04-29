@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using Dapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,11 @@ internal sealed class ProcessOutboxJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
+		using var activity = new Activity(ModuleName + "." + OutboxOptions.SectionName);
+		activity.Start();
+		activity.AddTag("module", ModuleName);
+		activity.AddTag("batchSize", _outboxOptions.Value.BatchSize.ToString());
+
 		_logger.LogInformation("{Module} - Beginning to process outbox messages", ModuleName);
 		
 		await using DbConnection connection = await _dbConnectionFactory.OpenConnectionAsync();
@@ -83,6 +89,8 @@ internal sealed class ProcessOutboxJob : IJob
 		await transaction.CommitAsync();
 
 		_logger.LogInformation("{Module} - Completed processing outbox messages", ModuleName);
+
+		activity.Stop();
 	}
 
 	private async Task<IReadOnlyList<OutboxMessage>> GetOutboxMessagesAsync(
