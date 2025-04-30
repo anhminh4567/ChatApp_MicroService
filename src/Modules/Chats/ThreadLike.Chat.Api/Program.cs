@@ -96,7 +96,7 @@ internal class Program
 		builder.Services.AddChatInfrastructure(builder.Configuration,builder.Environment);
 
 		// some service configure for api layer, lilke CORS ( in future, shared middleware )
-		builder.Services.AddApiModule(builder.Configuration);
+		builder.Services.AddApiModule(builder.Environment,builder.Configuration);
 
 		builder.Services.AddControllers();
 		builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>

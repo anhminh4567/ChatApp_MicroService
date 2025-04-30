@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,7 @@ namespace ThreadLike.Common.Api
 	public static class ApiConfiguration
 	{
 		
-		public static IServiceCollection AddApiModule(this IServiceCollection services, IConfiguration configuration)
+		public static IServiceCollection AddApiModule(this IServiceCollection services, IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
 		{
 			services.AddCors(options =>
 			{
@@ -21,9 +23,11 @@ namespace ThreadLike.Common.Api
 						.AllowAnyMethod()
 						.AllowAnyHeader();
 				});
+				string origin = configuration.GetSection("Client:Web").Value;
+			
 				options.AddPolicy(CorsPolicy.AllowClientSPA, policy =>
 				{
-					policy.WithOrigins("http://localhost:3100")
+					policy.WithOrigins(origin)
 						.AllowAnyHeader()
 						.AllowAnyMethod()
 						.AllowCredentials();

@@ -73,7 +73,7 @@ var rabbitMqSettings = new RabbitMqSettings()
 builder.Services.AddApplication([typeof(ThreadLike.User.Application.ApplicationConfiguration).Assembly]);
 builder.Services.AddUserApplication();
 // Add infra
-builder.Services.AddApiModule(builder.Configuration);
+builder.Services.AddApiModule(builder.Environment,builder.Configuration);
 
 builder.Services.AddInfrastructure(builder.Environment,builder.Configuration, rabbitMqSettings, UserModuleMetaData.ServiceName,
 	[(config, instanceId) => 

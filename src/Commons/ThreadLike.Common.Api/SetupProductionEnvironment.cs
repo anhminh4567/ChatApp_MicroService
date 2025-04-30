@@ -26,8 +26,10 @@ namespace ThreadLike.Common.Api
 			builder.Configuration.AddAzureKeyVault(
 			   new Uri(keyVaultUrl),
 			   new DefaultAzureCredential(
-				   new DefaultAzureCredentialOptions()//required when using user ManagedIdentity
-			   ),
+				   new DefaultAzureCredentialOptions()
+				   {
+					   
+				   }),
 			   new DelimiterResolveKeyVaultSecretManager());
 
 
